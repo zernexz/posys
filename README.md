@@ -9,7 +9,6 @@ Multi Camera Positioning System based on Convolution Net
 
 TODO
 - object 3d reconstruction (mesh intersection)
-- 
 In Progress
 - port subset of ConvNetJS into c++ version
 Done
