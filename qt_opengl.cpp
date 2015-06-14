@@ -32,6 +32,7 @@
 #include "vol.h"
 #include "convlayer.h"
 #include "poollayer.h"
+#include "relulayer.h"
 #include "softmaxlayer.h"
 #include "convnet.h"
 
@@ -482,6 +483,51 @@ static void unDist(int CamNum){
 	capture.release();
 }
 typedef double FP;
+
+
+vector<Mat> load_mnist(){
+	
+	
+    vector<Mat> vm;
+    for(int no;no<51;no++){
+		char numstr[512]; // enough to hold all numbers up to 64-bits
+		sprintf(numstr,"cifar10_batch_%d.png",no);
+		Mat mnist = imread(numstr, CV_LOAD_IMAGE_COLOR);
+		for(int i=0;i<mnist.rows;i++){
+			Mat m(32,32, CV_8UC3);
+			for(int j=0;j<32;j++){
+				for(int k=0;k<32;k++){
+					for(int d=0;d<3;d++){
+						
+						m.data[(j*32+k)*3+d]= (uint8_t) mnist.data[((i*1024)+(j*32+k))*3+d];
+						
+					}
+				}
+			}
+			vm.push_back(m);
+		}
+	}
+	
+	return vm;
+}
+
+vector<int> load_mnist_label(){
+	string line;
+	int val;
+	vector<int> vl;
+	ifstream myfile ("label");
+	  if (myfile.is_open())
+	  {
+		while ( getline (myfile,line,',') )
+		{
+			if(stringstream(line)>>val){
+				vl.push_back(val);
+			}
+		}
+		myfile.close();
+	  }
+	  return vl;
+}
 int main(void)
 {
 	//calibrateCamera(0);
@@ -554,9 +600,15 @@ int main(void)
 	Mat image,gray_image;
     image = imread(getTrainingSetPath(0,0), CV_LOAD_IMAGE_COLOR);
     
+    
+    
+    
     //Vol mat_to_img
     
     
+	vector<Mat> vm = load_mnist();
+	vector<int> vl = load_mnist_label();
+		
     
     
     
@@ -571,14 +623,16 @@ int main(void)
 		
 		//Vol<float>* v4 = Vol<float>::augment(*v3,300,0,0,true);
 		cout << "0" << endl;
-		ConvLayer<float>* cvl=new ConvLayer<float>(3,5,5,1,v3->sx,v3->sy);
+		ConvLayer<float>* cvl=new ConvLayer<float>(3,5,5,3,v3->sx,v3->sy);
 		cout << "1" << endl;
 		Vol<float>* v4 = cvl->forward(v3);
+		
+
+		
 		cout << "2" << endl;
 		Mat convimg = v4->npho_to_mat();
 		cout << "3" << endl;
 		cout << "4" << endl;
-		
 		
 		
 		for(int i=0;i<v5->sx*v5->sy*v5->depth;i++){
@@ -603,25 +657,47 @@ int main(void)
 		
 		
 		PoolLayer<float>* pl=new PoolLayer<float>(4,4,v4->depth,v4->sx,v4->sy);
-		Mat poolimg=pl->forward(v4)->npho_to_mat();
+		Vol<float>* v6=pl->forward(v4);
+		Mat poolimg=v6->npho_to_mat();
 		
+		cout << v3->sx << " x " << v3->sy << endl;
+		cout << v4->sx << " x " << v4->sy << endl;
+		cout << v6->sx << " x " << v6->sy << endl;
 		
-		
-		
-		
+		ReluLayer<float>* rl=new ReluLayer<float>(v6->depth,v6->sx,v6->sy);
+		Vol<float>* v7=rl->forward(v6);
+		Mat reluimg = v7->po_to_mat();
 		
         imshow("win1" , image);
         imshow("win2" , gray_image);
         imshow("ConvLayer" , convimg);
         imshow("PoolLayer" , poolimg);
+        
+        
+        imshow("ReluLayer" , reluimg);
+        
+        
+        char numstr[512]; // enough to hold all numbers up to 64-bits
+        for(int i=0;i<10;i++){
+			
+			sprintf(numstr,"MNIST %d",i);
+			imshow(numstr , vm[i]);
+		}
+        
+        
         cout << "5" << endl;
         
-        delete pl;
+        delete rl;
+        delete v7;
         
+        
+        delete pl;
+        delete v6;
         
 		delete smr;
 		delete sml;
         
+       
         delete v3;
 		delete v5;
 		delete v4;

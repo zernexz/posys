@@ -1,5 +1,5 @@
-#ifndef POOLLAYER_H
-#define POOLLAYER_H
+#ifndef RELULAYER_H
+#define RELULAYER_H
 
 #include "vol.h"
 #include "layer.h"
@@ -30,7 +30,7 @@
 using namespace std;
 
 template < typename FP >
-class PoolLayer : Layer<FP>{
+class ReluLayer : Layer<FP>{
 private:
 
 public:
@@ -59,31 +59,28 @@ public:
 	Vol<FP>* out_act;
 	
 	//num_neurons   In:{d,x,y} Conf:{l1_decay,l2_decay}
-	PoolLayer(int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=2,int pad=0){
+	ReluLayer(int in_depth,int in_sx,int in_sy){
 	
 	this->in_depth=in_depth;
 	this->in_sx=in_sx;
 	this->in_sy=in_sy;
-	this->layer_type="pool";
+	this->layer_type="relu";
 	this->in_act=NULL;
 	this->out_act=NULL;
-	this->sx=sx;
-	this->sy=sy;
-	this->stride=stride;
-	this->pad=pad;
 
 	cout << "cv 0" << endl;
 	cout << "cv 1" << endl;
 	this->out_depth = this->in_depth;
-	this->out_sx = floor((this->in_sx + this->pad * 2 - this->sx) / this->stride + 1);
-	this->out_sy = floor((this->in_sy + this->pad * 2 - this->sy) / this->stride + 1);
+	this->out_sx = this->in_sx;
+	this->out_sy = this->in_sy;
+
 	cout << "cv 2" << endl;
-	Utils<FP> ut;
+	/*Utils<FP> ut;
 	this->switchx = ut.zeros(this->out_sx*this->out_sy*this->out_depth);
-	this->switchy = ut.zeros(this->out_sx*this->out_sy*this->out_depth);
+	this->switchy = ut.zeros(this->out_sx*this->out_sy*this->out_depth);*/
 	cout << "cv 4" << endl;
 	}
-	~PoolLayer(){
+	~ReluLayer(){
 
 		cout << "clearrr3" << endl;
 		if(this->in_act != NULL){delete this->in_act;this->in_act=NULL;}
@@ -98,66 +95,31 @@ public:
 		this->in_act = V->clone();
 
 		cout << "feed b" << endl;
-		Vol<FP>* A = new Vol<FP>(this->out_sx,this->out_sy,this->out_depth,FP(0.0));
-		int n=0;
-		cout << "feed c" << endl;
+		Vol<FP>* V2 = V->clone();
+		int N = V->w.size();
 		
-		cout << "feed ddd" << endl;
-		for(int d=0;d<this->out_depth;d++){
-			int x = -this->pad;
-			int y = -this->pad;
-			for(int ax=0;ax<this->out_sx;x+=this->stride,ax++){
-				y = -this->pad;
-				for(int ay=0;ay<this->out_sy;y+=this->stride,ay++){
-					FP a(-99999);
-					for(int fx=0;fx<this->sx;fx++){
-						for(int fy=0;fy<this->sy;fy++){						
-							int oy = y+fy;
-							int ox = x+fx;
-							if(oy>=0 && oy<V->sy && ox>=0 && ox<V->sx){
-								FP v = V->get(ox,oy,d);
-								//Perform max pooling
-								if(v > a){
-									a = v;
-									winx=ox;
-									winy=oy;
-								}
-							}
-						}
-					}
-					this->switchx[n] = winx;
-					this->switchy[n] = winy;
-					n++;
-					A->set(ax,ay,d,a);
-				}
-			}
+		vector<float> V2w=V2->w;
+		for(int i=0;i<N;i++){
+			if(V2w[i] < 0) V2w[i]=0;
 		}
-
+		
 		cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
 		cout << "feed f" << endl;
-		this->out_act = A;
+		this->out_act = V2;
 		cout << "feed g" << endl;
 		cout << "feed h" << endl;
-		return A->clone();
+		return V2->clone();
 	}
 	void backward(int tmpy=0){
-		Vol<FP>* V = this->in_act;
+		Vol<FP>* V = this->in_act;		
+		Vol<FP>* V2 = this->out_act;
+		int N = V->w.size();
 		Utils<FP> ut;
 		V->dw = ut.zeros(V->w.size());
-		
-		int n=0;
-		for(int d=0;d<this->out_depth;d++){
-			int x = -this->pad;
-			int y = -this->pad;
-			for(int ax=0;ax<this->out_sx;x+=this->stride,ax++){
-				y = -this->pad;
-				for(int ay=0;ay<this->out_sy;y+=this->stride,ay++){
-					FP chain_grad = this->out_act->get_grad(ax,ay,d);
-					V->add_grad(this->switchx[n],this->switchy[n],d,chain_grad);
-					n++;
-				}
-			}
+		for(int i=0;i<N;i++){
+			if(V2->w[i] <= 0) V->dw[i] = 0;
+			else V->dw[i] = V2->dw[i];
 		}
 	}
 	
