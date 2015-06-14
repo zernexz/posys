@@ -15,7 +15,14 @@ Done
 http://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html
 
 TODO
-- object 3d reconstruction (mesh intersection)
+- room information parser
+- room model
+- camera model
+- construct pixel into mesh
+- mesh intersection
+- normalize image to fit ConvNet
+- visualizer
+
 
 
 
