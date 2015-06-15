@@ -6,6 +6,30 @@
 
 #IncludeRegexTransform: 
 
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/camera.cpp
+camera.h
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/camera.h
+fstream
+-
+boost/archive/text_oarchive.hpp
+-
+boost/archive/text_iarchive.hpp
+-
+boost/serialization/vector.hpp
+-
+opencv2/calib3d/calib3d.hpp
+-
+opencv2/core/core.hpp
+-
+opencv2/highgui/highgui.hpp
+-
+opencv2/imgproc/imgproc.hpp
+-
+opencv2/legacy/compat.hpp
+-
+glm/glm.hpp
+-
+
 /home/ryouma/opencv-2.4.9/samples/cpp/posys/camera.h
 boost/archive/text_oarchive.hpp
 -
@@ -71,10 +95,20 @@ opencv2/legacy/compat.hpp
 -
 
 /home/ryouma/opencv-2.4.9/samples/cpp/posys/convnet.h
-vol.h
-/home/ryouma/opencv-2.4.9/samples/cpp/posys/vol.h
 utils.h
 /home/ryouma/opencv-2.4.9/samples/cpp/posys/utils.h
+vol.h
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/vol.h
+convlayer.h
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/convlayer.h
+poollayer.h
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/poollayer.h
+relulayer.h
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/relulayer.h
+softmaxlayer.h
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/softmaxlayer.h
+convnet.h
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/convnet.h
 boost/archive/text_oarchive.hpp
 -
 boost/archive/text_iarchive.hpp
@@ -145,6 +179,8 @@ opencv2/imgproc/imgproc.hpp
 -
 opencv2/legacy/compat.hpp
 -
+
+/home/ryouma/opencv-2.4.9/samples/cpp/posys/memdump.cpp
 
 /home/ryouma/opencv-2.4.9/samples/cpp/posys/memdump.h
 

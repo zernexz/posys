@@ -1,5 +1,5 @@
-#ifndef POOLLAYER_H
-#define POOLLAYER_H
+#ifndef RELULAYER_H
+#define RELULAYER_H
 
 #include "vol.h"
 #include "layer.h"

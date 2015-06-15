@@ -676,15 +676,16 @@ int main(void)
         
         imshow("ReluLayer" , reluimg);
         
-        
+        cout << "******* " << vm.size() << " " << vl.size() << endl;
         char numstr[512]; // enough to hold all numbers up to 64-bits
-        for(int i=0;i<10;i++){
+        for(int i=29995;i<29995+10;i++){
 			
-			sprintf(numstr,"MNIST %d",i);
+			sprintf(numstr,"MNIST %d - %d",i,vl[i]);
 			imshow(numstr , vm[i]);
 		}
-        
-        
+		
+		
+		
         cout << "5" << endl;
         
         delete rl;

@@ -30,7 +30,7 @@
 using namespace std;
 
 template < typename FP >
-class SoftmaxLayer : Layer<FP>{
+class SoftmaxLayer : public Layer<FP>{
 private:
 
 public:

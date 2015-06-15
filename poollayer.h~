@@ -141,7 +141,7 @@ public:
 		cout << "feed h" << endl;
 		return A->clone();
 	}
-	void backward(){
+	void backward(int tmpy=0){
 		Vol<FP>* V = this->in_act;
 		Utils<FP> ut;
 		V->dw = ut.zeros(V->w.size());

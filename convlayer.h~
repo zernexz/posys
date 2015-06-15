@@ -113,7 +113,7 @@ public:
 			int x = -this->pad;
 			int y = -this->pad;
 			int f_sx=f->sx;
-			int f_sy=f->sy;
+			int f_depth=f->depth;
 			for(int ay=0;ay<this->out_sy;y+=xy_stride,ay++){
 				x = -this->pad;
 				for(int ax=0;ax<this->out_sx;x+=xy_stride,ax++){

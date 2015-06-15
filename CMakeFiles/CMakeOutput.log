@@ -1881,3 +1881,123 @@ Linking C executable cmTryCompileExec2424071112
 make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
 
 
+Determining if the function XOpenDisplay exists in the /usr/lib/x86_64-linux-gnu/libX11.so;/usr/lib/x86_64-linux-gnu/libXext.so passed with the following output:
+Change Dir: /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2738209761/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2738209761.dir/build.make CMakeFiles/cmTryCompileExec2738209761.dir/build
+make[1]: Entering directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2738209761.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec2738209761.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2738209761
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2738209761.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=XOpenDisplay    CMakeFiles/cmTryCompileExec2738209761.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2738209761 -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+Change Dir: /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2136768979/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2136768979.dir/build.make CMakeFiles/cmTryCompileExec2136768979.dir/build
+make[1]: Entering directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2136768979.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec2136768979.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec2136768979
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2136768979.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gethostbyname    CMakeFiles/cmTryCompileExec2136768979.dir/CheckFunctionExists.c.o  -o cmTryCompileExec2136768979 -rdynamic 
+make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+Change Dir: /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1508297531/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1508297531.dir/build.make CMakeFiles/cmTryCompileExec1508297531.dir/build
+make[1]: Entering directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1508297531.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec1508297531.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1508297531
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1508297531.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=connect    CMakeFiles/cmTryCompileExec1508297531.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1508297531 -rdynamic 
+make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+Change Dir: /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3705944733/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3705944733.dir/build.make CMakeFiles/cmTryCompileExec3705944733.dir/build
+make[1]: Entering directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3705944733.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec3705944733.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3705944733
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3705944733.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=remove    CMakeFiles/cmTryCompileExec3705944733.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3705944733 -rdynamic 
+make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+Change Dir: /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec255068480/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec255068480.dir/build.make CMakeFiles/cmTryCompileExec255068480.dir/build
+make[1]: Entering directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec255068480.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec255068480.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec255068480
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec255068480.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=shmat    CMakeFiles/cmTryCompileExec255068480.dir/CheckFunctionExists.c.o  -o cmTryCompileExec255068480 -rdynamic 
+make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+Change Dir: /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3317521700/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3317521700.dir/build.make CMakeFiles/cmTryCompileExec3317521700.dir/build
+make[1]: Entering directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3317521700.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec3317521700.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec3317521700
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3317521700.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=IceConnectionNumber    CMakeFiles/cmTryCompileExec3317521700.dir/CheckFunctionExists.c.o  -o cmTryCompileExec3317521700 -rdynamic -lICE 
+make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+
+
+Determining if files pthread.h exist passed with the following output:
+Change Dir: /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec3665910660/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3665910660.dir/build.make CMakeFiles/cmTryCompileExec3665910660.dir/build
+make[1]: Entering directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3665910660.dir/CheckIncludeFiles.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec3665910660.dir/CheckIncludeFiles.c.o   -c /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+Linking C executable cmTryCompileExec3665910660
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3665910660.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTryCompileExec3665910660.dir/CheckIncludeFiles.c.o  -o cmTryCompileExec3665910660 -rdynamic 
+make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+
+
+Determining if the function pthread_create exists in the pthread passed with the following output:
+Change Dir: /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1539627249/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1539627249.dir/build.make CMakeFiles/cmTryCompileExec1539627249.dir/build
+make[1]: Entering directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1539627249.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec1539627249.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1539627249
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1539627249.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTryCompileExec1539627249.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1539627249 -rdynamic -lpthread 
+make[1]: Leaving directory `/home/ryouma/opencv-2.4.9/samples/cpp/posys/CMakeFiles/CMakeTmp'
+
+

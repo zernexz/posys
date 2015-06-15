@@ -28,6 +28,8 @@ if( UNIX )
   add_definitions(-Wall)
   add_definitions(-std=c++11)
   add_definitions(-O3)
+  add_definitions(-fopenmp)
+ 
   #add_definitions(-fpermissive)
 
   find_package( OpenGL REQUIRED )

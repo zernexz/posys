@@ -30,7 +30,7 @@
 using namespace std;
 
 template < typename FP >
-class ReluLayer : Layer<FP>{
+class ReluLayer : public Layer<FP>{
 private:
 
 public:

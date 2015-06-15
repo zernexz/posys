@@ -30,7 +30,7 @@
 using namespace std;
 
 template < typename FP >
-class PoolLayer : Layer<FP>{
+class PoolLayer : public Layer<FP>{
 private:
 
 public:

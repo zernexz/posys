@@ -1,8 +1,13 @@
 #ifndef CONVNET_H
 #define CONVNET_H
 
-#include "vol.h"
 #include "utils.h"
+#include "vol.h"
+#include "convlayer.h"
+#include "poollayer.h"
+#include "relulayer.h"
+#include "softmaxlayer.h"
+#include "convnet.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
@@ -34,6 +39,27 @@ class ConvNet{
 private:
 
 public:
+ConvNet(){
+		vector<Layer<float>* > net;
+		string sugar("conv[sx:100,sy:100]");
+		
+		{
+			ConvLayer<float>* cvl=new ConvLayer<float>(3,5,5,3,640,480);
+			cout << "1" << endl;
+			//Vol<float>* v4 = cvl->forward(v3);
+			net.push_back(cvl);
+		}
+        
+        
+        for(int i=0;i<net.size();i++){
+			delete net[i];
+			net[i]=NULL;
+		}
+        
+}
+~ConvNet(){
+}
+
 };
 
 

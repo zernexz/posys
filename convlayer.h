@@ -31,7 +31,7 @@
 using namespace std;
 
 template < typename FP >
-class ConvLayer : Layer<FP>{
+class ConvLayer : public Layer<FP>{
 private:
 
 public:
