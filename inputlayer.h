@@ -2,6 +2,7 @@
 #define INPUTLAYER_H
 
 #include "vol.h"
+#include "layer.h"
 #include "utils.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -29,7 +30,7 @@
 using namespace std;
 
 template < typename FP >
-class InputLayer{
+class InputLayer : public Layer<FP>{
 private:
 
 public:
@@ -60,12 +61,12 @@ public:
 	InputLayer(int out_depth,int out_sx,int out_sy):layer_type("input"),in_act(NULL),out_act(NULL),out_depth(out_depth),out_sx(out_sx),out_sy(out_sy){
 	}
 	~InputLayer(){
-		cout << "clearrr" << endl;
-		cout << "clearrr3" << endl;
+		//cout << "clearrr" << endl;
+		//cout << "clearrr3" << endl;
 		if(this->in_act != NULL){delete this->in_act;this->in_act=NULL;}
-		cout << "clearrr5" << endl;
+		//cout << "clearrr5" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
-		cout << "clearrr4" << endl;
+		//cout << "clearrr4" << endl;
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
@@ -73,15 +74,15 @@ public:
 			delete this->in_act;
 		this->in_act = V->clone();
 
-		cout << "feed e" << endl;
+		//cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
-		cout << "feed f" << endl;
+		//cout << "feed f" << endl;
 		this->out_act = V;
-		cout << "feed g" << endl;
-		cout << "feed h" << endl;
+		//cout << "feed g" << endl;
+		//cout << "feed h" << endl;
 		return V->clone();
 	}
-	void backward(){
+	void backward(int tmpy=0){
 	}
 	
 	vector< map<string,void* > > getParamsAndGrads(){

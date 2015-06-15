@@ -89,7 +89,7 @@ public:
 
 		
 #endif
-		std::cout << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
+		//std::cout << "Vol : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 		
 	}
 	~Vol(){
@@ -274,7 +274,7 @@ public:
 			img=t1;
 		}
 
-		cout << "3" << endl;
+		//cout << "3" << endl;
 		for(int i=0;i<img.rows;i++){
 			for(int j=0;j<img.cols;j++){
 				for(int k=0;k<img.channels();k++){ //cout << "3.1" << endl;
@@ -301,7 +301,7 @@ public:
 			img=t1;
 		}
 
-		cout << "3" << endl;
+		//cout << "3" << endl;
 		for(int i=0;i<img.rows;i++){
 			for(int j=0;j<img.cols;j++){
 				for(int k=0;k<img.channels();k++){ //cout << "3.1" << endl;

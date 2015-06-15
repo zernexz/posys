@@ -39,6 +39,8 @@ CMakeFiles/posys.dir/qt_opengl.cpp.o
  /home/ryouma/opencv-2.4.9/samples/cpp/posys/camera.h
  /home/ryouma/opencv-2.4.9/samples/cpp/posys/convlayer.h
  /home/ryouma/opencv-2.4.9/samples/cpp/posys/convnet.h
+ /home/ryouma/opencv-2.4.9/samples/cpp/posys/fullyconnlayer.h
+ /home/ryouma/opencv-2.4.9/samples/cpp/posys/inputlayer.h
  /home/ryouma/opencv-2.4.9/samples/cpp/posys/layer.h
  /home/ryouma/opencv-2.4.9/samples/cpp/posys/memdump.h
  /home/ryouma/opencv-2.4.9/samples/cpp/posys/picojson/picojson.h

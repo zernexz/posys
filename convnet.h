@@ -41,7 +41,7 @@ private:
 public:
 ConvNet(){
 		vector<Layer<float>* > net;
-		string sugar("conv[sx:100,sy:100]");
+		string sugar("input[sx:640,sy:480,depth:3]->conv[sx:100,sy:100]");
 		
 		{
 			ConvLayer<float>* cvl=new ConvLayer<float>(3,5,5,3,640,480);

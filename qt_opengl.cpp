@@ -30,9 +30,12 @@
 
 #include "utils.h"
 #include "vol.h"
+
+#include "inputlayer.h"
 #include "convlayer.h"
 #include "poollayer.h"
 #include "relulayer.h"
+#include "fullyconnlayer.h"
 #include "softmaxlayer.h"
 #include "convnet.h"
 
@@ -312,7 +315,7 @@ static char * getConfigPath(int type,int no){
 }
 
 static char * getTrainingSetPath(int type,int no){
-	return "/home/ryouma/Desktop/RO2_Poring.png";
+	return "/home/ryouma/Desktop/cow.png";
 	
 	char winstr[512]="/home/ryouma/opencv-2.4.9/samples/cpp/posys/";
 	char numstr[512]; // enough to hold all numbers up to 64-bits
@@ -528,6 +531,180 @@ vector<int> load_mnist_label(){
 	  }
 	  return vl;
 }
+vector<Layer<FP>* > new_convnet(){
+	//input[sx:3200,sy:3200,depth:3]>conv[sx:5,filters:16,stride:1,pad:2]>relu>pool[sx:4,sy:4]>fc[num_classes:10]
+	string sugar("input[sx:32,sy:32,depth:3]>conv[sx:5,filters:16,stride:1,pad:2]>relu>pool[sx:5,sy:5]>fc[num_classes:10]");
+	
+	vector<Layer<FP>* > vl;
+	
+	string line;
+	string type;
+	string conf;
+	string att;
+	int val;
+	stringstream ss;
+	ss << sugar;
+	
+	int po_sx;
+	int po_sy;
+	int po_depth;
+	while ( getline (ss,line,'>') )
+		{
+			if(stringstream(line)>>conf){
+				cout << "conf:" << conf << endl;
+				stringstream sc;
+				string tmp;
+				sc << conf;
+				
+				string ltype;
+				vector<string> attrs;
+				vector<int> vals;
+							
+				int co=0;
+				while ( getline (sc,tmp,'[') )
+				{
+					if(stringstream(tmp)>>type){
+						if(co==0){//Type of Layer
+							//cout << "Layer:" << type << endl;
+							ltype=type;
+						}
+						else{//Attributes
+							//cout << "Attr " <<  type << endl;
+							stringstream cc;
+							cc << type;
+							string tm,tmm;
+							
+							while ( getline (cc,tm,',') )
+							{
+								if(stringstream(tm)>>tmm){
+									
+									stringstream scc;
+									scc << tmm;
+									string tp;
+									int cn=0;
+									while ( getline (scc,tmm,':') )
+									{
+										if(cn==0&&stringstream(tmm)>>tp){
+											
+										}
+										else if(cn==1&&stringstream(tmm)>>val){
+											//cout << "Attr " << tp << ":" << val << endl;
+											attrs.push_back(tp);
+											vals.push_back(val);
+										}
+										cn++;
+									}
+								}
+							}
+							//Add new Layer here
+							{
+								cout << "* " << ltype << endl;
+								int sx=0;
+								int sy=0;
+								int depth=0;
+								int pad=0;
+								int stride=0;
+								int filters=0;
+								int num_neurons=0;
+/*
+var layer_defs, net, trainer;
+var t = "layer_defs = [];\n\
+layer_defs.push({type:'input', out_sx:32, out_sy:32, out_depth:3});\n\
+* InputLayer(int out_depth,int out_sx,int out_sy)
+layer_defs.push({type:'conv', sx:5, filters:16, stride:1, pad:2, activation:'relu'});\n\
+* ConvLayer(int out_depth,int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=1,int pad=0,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0))
+* ReluLayer(int in_depth,int in_sx,int in_sy)
+layer_defs.push({type:'pool', sx:2, stride:2});\n\
+* PoolLayer(int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=2,int pad=0)
+layer_defs.push({type:'conv', sx:5, filters:20, stride:1, pad:2, activation:'relu'});\n\
+layer_defs.push({type:'pool', sx:2, stride:2});\n\
+layer_defs.push({type:'conv', sx:5, filters:20, stride:1, pad:2, activation:'relu'});\n\
+layer_defs.push({type:'pool', sx:2, stride:2});\n\
+layer_defs.push({type:'softmax', num_classes:10});\n\
+* SoftmaxLayer(int in_depth,int in_sx,int in_sy)
+\n\
+net = new convnetjs.Net();\n\
+net.makeLayers(layer_defs);\n\
+\n\
+trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:4, l2_decay:0.0001});\n\
+";
+
+ * */
+ 
+								for(int i=0;i<attrs.size();i++){
+									cout << attrs[i] << " " << vals[i] << endl;
+									if(attrs[i].compare("sx") == 0){
+										sx=vals[i];
+									}
+									if(attrs[i].compare("sy") == 0){
+										sy=vals[i];
+									}
+									if(attrs[i].compare("depth") == 0){
+										depth=vals[i];
+									}
+									if(attrs[i].compare("stride") == 0){
+										stride=vals[i];
+									}
+									if(attrs[i].compare("pad") == 0){
+										pad=vals[i];
+									}
+									if(attrs[i].compare("filters") == 0){
+										filters=vals[i];
+									}
+									if(attrs[i].compare("num_neurons") == 0){
+										num_neurons=vals[i];
+									}
+								}
+							
+								cout << " >> " << ltype << " " << sx << " " << sy << " " << depth << " " << stride << " " << pad << " " << filters << endl;
+								if(ltype.compare("input") == 0){
+									InputLayer<FP>* il=new InputLayer<FP>(sx,sy,depth);	
+									vl.push_back(il);
+									po_sx=sx;
+									po_sy=sy;
+									po_depth=depth;
+								}
+								else{
+									if(ltype.compare("conv") == 0){
+										ConvLayer<FP>* cl=new ConvLayer<FP>(filters,sx,sx,po_depth,po_sx,po_sy);
+										vl.push_back(cl);
+										po_sx=cl->out_sx;
+										po_sy=cl->out_sy;
+										po_depth=cl->out_depth;
+									}
+									if(ltype.compare("relu") == 0){
+										ReluLayer<FP>* rl=new ReluLayer<FP>(po_depth,po_sx,po_sy);
+										vl.push_back(rl);
+									}
+									if(ltype.compare("pool") == 0){
+										cout << sx << " " << sy << " " << po_depth << " " << po_sx << " " << po_sy << endl;
+										PoolLayer<FP>* pl=new PoolLayer<FP>(sx,sy,po_depth,po_sx,po_sy);
+										//PoolLayer<FP>* pl=new PoolLayer<FP>(5,5,16,1000,1000);
+										vl.push_back(pl);
+									}
+									if(ltype.compare("softmax") == 0){
+										SoftmaxLayer<FP>* sml=new SoftmaxLayer<FP>(po_depth,po_sx,po_sy);
+										vl.push_back(sml);
+									}
+									if(ltype.compare("fc") == 0){
+										cout << " ** " << num_neurons << " " << po_depth << " " << po_sx << " " << po_sy << endl;
+										FullyConnLayer<FP>* fc=new FullyConnLayer<FP>(num_neurons,po_depth,po_sx,po_sy);
+										vl.push_back(fc);
+										po_sx=fc->out_sx;
+										po_sy=fc->out_sy;
+										po_depth=fc->out_depth;
+									}
+								}
+							}
+						}
+					}
+					co++;
+				}
+			}
+			
+		}
+	return vl;
+}
 int main(void)
 {
 	//calibrateCamera(0);
@@ -622,17 +799,17 @@ int main(void)
 		Vol<float>* v3 = Vol<float>::mat_to_vol(image);
 		
 		//Vol<float>* v4 = Vol<float>::augment(*v3,300,0,0,true);
-		cout << "0" << endl;
-		ConvLayer<float>* cvl=new ConvLayer<float>(3,5,5,3,v3->sx,v3->sy);
-		cout << "1" << endl;
+		//cout << "0" << endl;
+		ConvLayer<float>* cvl=new ConvLayer<float>(3,9,9,3,v3->sx,v3->sy);
+		//cout << "1" << endl;
 		Vol<float>* v4 = cvl->forward(v3);
 		
 
 		
-		cout << "2" << endl;
+		//cout << "2" << endl;
 		Mat convimg = v4->npho_to_mat();
-		cout << "3" << endl;
-		cout << "4" << endl;
+		//cout << "3" << endl;
+		//cout << "4" << endl;
 		
 		
 		for(int i=0;i<v5->sx*v5->sy*v5->depth;i++){
@@ -644,39 +821,39 @@ int main(void)
 		SoftmaxLayer<float>* sml=new SoftmaxLayer<float>(2,2,2);
 		Vol<float>* smr=sml->forward(v5);
 		
-		cout << smr->sx << " " << smr->sy << " " << smr->depth << endl;
+		//cout << smr->sx << " " << smr->sy << " " << smr->depth << endl;
 		for(int i=0;i<smr->sx;i++){
 			for(int j=0;j<smr->sy;j++){
 				for(int k=0;k<smr->depth;k++){
-					cout << smr->get(i,j,k) << " ";
+					//cout << smr->get(i,j,k) << " ";
 				}
 			}
 		}
-		cout << endl;
+		//cout << endl;
 		
 		
 		
-		PoolLayer<float>* pl=new PoolLayer<float>(4,4,v4->depth,v4->sx,v4->sy);
-		Vol<float>* v6=pl->forward(v4);
-		Mat poolimg=v6->npho_to_mat();
+		PoolLayer<float>* pl=new PoolLayer<float>(5,5,16,9000,9000);
+		//Vol<float>* v6=pl->forward(v4);
+		//Mat poolimg=v6->npho_to_mat();
 		
-		cout << v3->sx << " x " << v3->sy << endl;
-		cout << v4->sx << " x " << v4->sy << endl;
-		cout << v6->sx << " x " << v6->sy << endl;
+		//cout << v3->sx << " x " << v3->sy << endl;
+		//cout << v4->sx << " x " << v4->sy << endl;
+		//cout << v6->sx << " x " << v6->sy << endl;
 		
-		ReluLayer<float>* rl=new ReluLayer<float>(v6->depth,v6->sx,v6->sy);
-		Vol<float>* v7=rl->forward(v6);
-		Mat reluimg = v7->po_to_mat();
+		//ReluLayer<float>* rl=new ReluLayer<float>(v6->depth,v6->sx,v6->sy);
+		//Vol<float>* v7=rl->forward(v6);
+		//Mat reluimg = v7->po_to_mat();
 		
         imshow("win1" , image);
         imshow("win2" , gray_image);
         imshow("ConvLayer" , convimg);
-        imshow("PoolLayer" , poolimg);
+        //imshow("PoolLayer" , poolimg);
         
         
-        imshow("ReluLayer" , reluimg);
+        //imshow("ReluLayer" , reluimg);
         
-        cout << "******* " << vm.size() << " " << vl.size() << endl;
+        //cout << "******* " << vm.size() << " " << vl.size() << endl;
         char numstr[512]; // enough to hold all numbers up to 64-bits
         for(int i=29995;i<29995+10;i++){
 			
@@ -686,14 +863,17 @@ int main(void)
 		
 		
 		
-        cout << "5" << endl;
+        //cout << "5" << endl;
         
-        delete rl;
-        delete v7;
+        
+        
+        
+        //delete rl;
+        //delete v7;
         
         
         delete pl;
-        delete v6;
+        //delete v6;
         
 		delete smr;
 		delete sml;
@@ -703,7 +883,14 @@ int main(void)
 		delete v5;
 		delete v4;
 		delete cvl;
-		cout << "6" << endl;
+		//cout << "6" << endl;
+		
+		
+		vector<Layer<FP>*> vl=new_convnet();
+		for(int i=0;i<vl.size();i++){
+			delete vl[i];
+		}
+		
         int key = waitKey(1);
         if(key==27)
             return 0;

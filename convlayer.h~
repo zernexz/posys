@@ -31,7 +31,7 @@
 using namespace std;
 
 template < typename FP >
-class ConvLayer : Layer<FP>{
+class ConvLayer : public Layer<FP>{
 private:
 
 public:
@@ -94,12 +94,12 @@ public:
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
 
-		clock_t begin_time = clock();
+		
 
 		if(this->in_act != NULL)
 			delete this->in_act;
 		this->in_act = V->clone();
-
+		
 		cout << "feed b" << endl;
 		Vol<FP>* A = new Vol<FP>(this->out_sx,this->out_sy,this->out_depth,FP(0.0));
 		cout << "feed c" << endl;
@@ -108,6 +108,10 @@ public:
 		int V_depth=V->depth;
 		int xy_stride = this->stride;
 		cout << "feed ddd" << endl;
+
+
+		clock_t begin_time = clock();
+		#pragma omp parallel for
 		for(int d=0;d<this->out_depth;d++){
 			Vol<FP>* f = this->filters[d];
 			int x = -this->pad;
@@ -132,17 +136,18 @@ public:
 					a += this->biases->w[d];
 					A->set(ax,ay,d,a);
 				}
-			}cout << "feed d" << endl;
+			}
 		}
-		cout << "feed e" << endl;
-		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
-		cout << "feed f" << endl;
-		this->out_act = A;
-		cout << "feed g" << endl;
-		cout << "feed h" << endl;
-
 		std::cout << "ConvLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
+		//cout << "feed e" << endl;
+		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
+		//cout << "feed f" << endl;
+		this->out_act = A;
+		//cout << "feed g" << endl;
+		//cout << "feed h" << endl;
+
+		
 		return A->clone();
 	}
 	void backward(int tmpy=0){

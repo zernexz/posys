@@ -101,7 +101,7 @@ public:
 		cout << "feed ddd" << endl;
 		for(int i=0;i<this->out_depth;i++){
 			FP a(0);
-			vector<FP>* wi = this->filters[i];
+			Vol<FP>* wi = this->filters[i];
 			for(int d=0;d<this->num_inputs;d++){
 				//Vw * wi
 				a += V->w[d] * wi->w[d];
@@ -118,7 +118,7 @@ public:
 		cout << "feed h" << endl;
 		return A->clone();
 	}
-	void backward(){
+	void backward(int tmpy=0){
 		Vol<FP>* V = this->in_act;
 		Utils<FP> ut;
 		V->dw = ut.zeros(V->w.size());
@@ -128,7 +128,7 @@ public:
 			FP chain_grad = this->out_act->dw[i];
 			for(int d=0;d<this->num_inputs;d++){
 				V->dw[d] += tfi->w[d]*chain_grad;
-				tfi.dw[d] += V.w[d]*chain_grad;
+				tfi->dw[d] += V->w[d]*chain_grad;
 			}
 			this->biases->dw[i] += chain_grad;
 		}
@@ -137,7 +137,7 @@ public:
 	
 	vector< map<string,void* > > getParamsAndGrads(){
 		vector< map<string,void* > > v;
-		for(int i=0;i<this->out_depth;i++){
+		/*for(int i=0;i<this->out_depth;i++){
 			map<string,void* > m;
 			m["params"] = (void*) this->filters[i]->w;
 			m["grads"] = (void*) this->filters[i]->dw;
@@ -150,7 +150,8 @@ public:
 		m["grads"] = (void*) this->biases->dw;
 		m["l2_decay_mul"] = (void*) &FP(0.0);
 		m["l1_decay_mul"] = (void*) &FP(0.0);
-		v.push_back(m);
+		
+		v.push_back(m);*/
 		return v;
 	}
 	

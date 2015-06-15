@@ -53,7 +53,7 @@ set( POSYS_SOURCES
 
 
 ADD_EXECUTABLE(posys ${POSYS_SOURCES})
-TARGET_LINK_LIBRARIES(posys ${POSYS_LIBS} -lboost_serialization -std=c++11 -pedantic -fopenmp -pthread)
+TARGET_LINK_LIBRARIES(posys ${POSYS_LIBS} -lboost_serialization -std=c++11)
 
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube4.avi ${CMAKE_CURRENT_BINARY_DIR}/cube4.avi COPYONLY)

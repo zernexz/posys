@@ -16,6 +16,7 @@
 #include <string>
 #include <random>
 #include <cmath>
+#include <ctime>
 
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/core/core.hpp>
@@ -68,25 +69,25 @@ public:
 	this->in_act=NULL;
 	this->out_act=NULL;
 
-	cout << "cv 0" << endl;
-	cout << "cv 1" << endl;
+	//cout << "cv 0" << endl;
+	//cout << "cv 1" << endl;
 	this->out_depth = this->in_depth;
 	this->out_sx = this->in_sx;
 	this->out_sy = this->in_sy;
 
-	cout << "cv 2" << endl;
+	//cout << "cv 2" << endl;
 	/*Utils<FP> ut;
 	this->switchx = ut.zeros(this->out_sx*this->out_sy*this->out_depth);
 	this->switchy = ut.zeros(this->out_sx*this->out_sy*this->out_depth);*/
-	cout << "cv 4" << endl;
+	//cout << "cv 4" << endl;
 	}
 	~ReluLayer(){
 
-		cout << "clearrr3" << endl;
+		//cout << "clearrr3" << endl;
 		if(this->in_act != NULL){delete this->in_act;this->in_act=NULL;}
-		cout << "clearrr5" << endl;
+		//cout << "clearrr5" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
-		cout << "clearrr4" << endl;
+		//cout << "clearrr4" << endl;
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
@@ -94,21 +95,25 @@ public:
 			delete this->in_act;
 		this->in_act = V->clone();
 
-		cout << "feed b" << endl;
+		//cout << "feed b" << endl;
 		Vol<FP>* V2 = V->clone();
 		int N = V->w.size();
 		
-		vector<float> V2w=V2->w;
+		vector<FP> V2w=V2->w;
+		clock_t begin_time = clock();
+		#pragma omp parallel for
 		for(int i=0;i<N;i++){
 			if(V2w[i] < 0) V2w[i]=0;
 		}
+		std::cout << "ReluLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
+
 		
-		cout << "feed e" << endl;
+		//cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
-		cout << "feed f" << endl;
+		//cout << "feed f" << endl;
 		this->out_act = V2;
-		cout << "feed g" << endl;
-		cout << "feed h" << endl;
+		//cout << "feed g" << endl;
+		//cout << "feed h" << endl;
 		return V2->clone();
 	}
 	void backward(int tmpy=0){

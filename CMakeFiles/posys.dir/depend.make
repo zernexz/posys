@@ -38,6 +38,8 @@ CMakeFiles/posys.dir/memdump.cpp.o: memdump.cpp
 CMakeFiles/posys.dir/qt_opengl.cpp.o: camera.h
 CMakeFiles/posys.dir/qt_opengl.cpp.o: convlayer.h
 CMakeFiles/posys.dir/qt_opengl.cpp.o: convnet.h
+CMakeFiles/posys.dir/qt_opengl.cpp.o: fullyconnlayer.h
+CMakeFiles/posys.dir/qt_opengl.cpp.o: inputlayer.h
 CMakeFiles/posys.dir/qt_opengl.cpp.o: layer.h
 CMakeFiles/posys.dir/qt_opengl.cpp.o: memdump.h
 CMakeFiles/posys.dir/qt_opengl.cpp.o: picojson/picojson.h
