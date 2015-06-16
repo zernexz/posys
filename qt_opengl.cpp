@@ -656,8 +656,10 @@ vector<Layer<FP>* > new_convnet(string sugar){
 									if(ltype.compare("pool") == 0){
 										cout << sx << " " << sy << " " << po_depth << " " << po_sx << " " << po_sy << endl;
 										PoolLayer<FP>* pl=new PoolLayer<FP>(sx,sy,po_depth,po_sx,po_sy);
-										//PoolLayer<FP>* pl=new PoolLayer<FP>(5,5,16,1000,1000);
 										vl.push_back(pl);
+										po_sx=pl->out_sx;
+										po_sy=pl->out_sy;
+										po_depth=pl->out_depth;
 									}
 									if(ltype.compare("softmax") == 0){
 										SoftmaxLayer<FP>* sml=new SoftmaxLayer<FP>(po_depth,po_sx,po_sy);
@@ -679,6 +681,7 @@ vector<Layer<FP>* > new_convnet(string sugar){
 				}
 			}
 		}
+		
 	return vl;
 }
 int main(void)
@@ -763,26 +766,65 @@ int main(void)
 	vector<int> vl = load_mnist_label();
 		
     
-    
+    FP* pred=new FP[200];
+	int i_pred=0;
     
     int k=0;
+    
+ConvNet<FP>* cnet=new ConvNet<FP>(new_convnet("\
+input[sx:32,sy:32,depth:3]>conv[sx:5,filters:25,stride:1,pad:2]>relu[]>pool[sx:2,sy:2]\
+>conv[sx:5,filters:20,stride:1,pad:2]>relu[]>pool[sx:2,sy:2]\
+>fc[num_neurons:10]>softmax[]\
+"));
+
     while(true)
     {
 		//cvtColor(image, gray_image, CV_BGR2GRAY);
 		
 		//>pool[sx:5,sy:5]>fc[num_classes:10]
-		ConvNet<FP>* cnet=new ConvNet<FP>(new_convnet("input[sx:32,sy:32,depth:3]>conv[sx:5,filters:16,stride:1,pad:2]>relu>pool[sx:5,sy:5]"));
-		Vol<FP>* v3 = Vol<FP>::mat_to_vol(vm[k]);
-		Vol<FP>* v4 = cnet->forward(v3);
-		Mat convnet = v4->npho_to_mat();
-		imshow("ConvNet" , convnet);
 		
-		k++;
-		if(k>vm.size())
+//>softmax[num_classes:10]
+		Vol<FP>* v3 = Vol<FP>::mat_to_vol(vm[k]);
+		
+		
+		cnet->forward(v3);
+		FP result = ( vl[k] == cnet->getPrediction() )?FP(1.0):FP(0.0);
+		if(result < 0.5){
+			cnet->train(v3,vl[k]);
+			result = ( vl[k] == cnet->getPrediction() )?FP(1.0):FP(0.0);
+		}
+		
+		cout << "Result " << vl[k] << cnet->getPrediction();
+		pred[i_pred++]= result;
+		i_pred = (i_pred >= 200)?0:i_pred;
+		FP rp=FP(0);
+		for(int i=0;i<200;i++){
+			rp+=pred[i];
+		}
+		rp/=200;
+		cout << "Correct Percent : " << rp << endl;
+		//Vol<FP>* v4 = cnet->forward(v3);
+		//Mat convnet = v4->npho_to_mat();
+		for(int i=0;i<cnet->net.size()-1;i++){
+			cout << cnet->net[i]->get_layer_type() << " " << cnet->net[i]->get_out_act()->sx  << " " << cnet->net[i]->get_out_act()->sy << " "  << cnet->net[i]->get_out_act()->depth << endl;
+			Mat inp = cnet->net[i]->get_out_act()->npho_to_mat();
+			if(i==cnet->net.size()-2)
+			inp = cnet->net[i]->get_out_act()->po_to_mat();
+			cout << " == " << inp.cols << " " << inp.rows << endl;
+			resize(inp,inp,Size(512,512), 0, 0, INTER_AREA);
+			char numstr[512]; // enough to hold all numbers up to 64-bits
+			sprintf(numstr,"%d %s",i,cnet->net[i]->get_layer_type().c_str());
+			imshow(numstr , inp );
+		}
+		
+		if(result > 0.5)
+			k++;
+			
+		if(k>vm.size()-1)
 			k=0;
 			
 		delete v3;
-		delete v4;
+		//delete v4;
 			
 		/*
 		Vol<float>* v5 = new Vol<float>(2,2,2);
@@ -895,6 +937,7 @@ int main(void)
             return 0;
     }
     
+	delete cnet;
 	
 	/*
 	int numBoards = 40;

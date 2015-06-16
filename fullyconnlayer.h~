@@ -56,13 +56,15 @@ public:
 
 	
 	//num_neurons   In:{d,x,y} Conf:{l1_decay,l2_decay}
-	FullyConnLayer(int num_neurons,int in_depth,int in_sx,int in_sy,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0)):in_depth(in_depth),in_sx(in_sx),in_sy(in_sy),l1_decay_mul(l1_decay_mul),l2_decay_mul(l2_decay_mul),layer_type("fc"),bias(bias_pref),biases(NULL),out_depth(num_neurons){
+	FullyConnLayer(int num_neurons,int in_depth,int in_sx,int in_sy,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0)):in_depth(in_depth),in_sx(in_sx),in_sy(in_sy),l1_decay_mul(l1_decay_mul),l2_decay_mul(l2_decay_mul),layer_type("fc"),bias(bias_pref),biases(NULL){
 	this->in_act=NULL;
 	this->out_act=NULL;
 	cout << "cv 0" << endl;
 	this->num_inputs = this->in_sx * this->in_sy * this->in_depth;
 	this->out_sx = 1;
 	this->out_sy = 1;
+	this->out_depth = num_neurons;
+
 	cout << "cv 1" << endl;
 	this->bias = bias_pref;
 	cout << "cv 2" << endl;
@@ -94,28 +96,33 @@ public:
 			delete this->in_act;
 		this->in_act = V->clone();
 
-		cout << "feed b" << endl;
+		//cout << "feed b" << endl;
 		Vol<FP>* A = new Vol<FP>(1,1,this->out_depth,FP(0.0));
-		cout << "feed c" << endl;
+		//cout << "feed c" << endl;
 		
-		cout << "feed ddd" << endl;
+
+		//cout << " ::: ";
+		//cout << "feed ddd" << endl;
 		for(int i=0;i<this->out_depth;i++){
 			FP a(0);
 			Vol<FP>* wi = this->filters[i];
 			for(int d=0;d<this->num_inputs;d++){
 				//Vw * wi
-				a += V->w[d] * wi->w[d];
+				a += this->in_act->w[d] * wi->w[d];
 			}
 			a+=this->biases->w[i];
 			A->w[i] = a;
+			//cout << a << " ";
 		}
+		//cout << " ::: " << V->sx << " " << V->sy << " " << V->depth << endl;
 
-		cout << "feed e" << endl;
+		//cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
-		cout << "feed f" << endl;
+		//cout << "feed f" << endl;
+		//cout << " ---- " << A->w.size() << endl;
 		this->out_act = A;
-		cout << "feed g" << endl;
-		cout << "feed h" << endl;
+		//cout << "feed g" << endl;
+		//cout << "feed h" << endl;
 		return A->clone();
 	}
 	void backward(int tmpy=0){
@@ -155,6 +162,36 @@ public:
 		v.push_back(m);
 		return v;
 	}
+string get_layer_type(){
+	return this->layer_type;
+}
+Vol<FP>* get_in_act(){
+	return this->in_act;
+}
+Vol<FP>* get_out_act(){
+	Vol<FP>* oa=this->out_act;
+	
+	int maxi=0;
+	FP maxv=oa->w[0];
+	int N=oa->w.size();
+	for(int i=1;i<N;i++){
+		if( maxv < oa->w[i] ){
+			maxv = oa->w[i];
+			maxi = i;
+		}
+	}
+Vol<FP>* A = new Vol<FP>(oa->depth,oa->sy,3,FP(0.0));
+	for(int i=0;i<N;i++){
+		for(int d=0;d<3;d++){
+			if(d==2 && i==maxi)
+			A->w[i*3+d]=oa->w[i];
+			if(i!=maxi)
+			A->w[i*3+d]=oa->w[i];
+		}
+	}
+
+	return A;
+}
 	
 };
 

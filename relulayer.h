@@ -89,21 +89,22 @@ public:
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
-		if(this->in_act != NULL)
-			delete this->in_act;
+		//cout << "@1" << endl;
+		if(this->in_act != NULL){
+			delete this->in_act;this->in_act=NULL;
+		}
 		this->in_act = V->clone();
-
+		//cout << "@2" << endl;
 		//cout << "feed b" << endl;
 		Vol<FP>* V2 = V->clone();
-		int N = V->w.size();
-		
-		vector<FP> V2w=V2->w;
+		int N = V2->w.size();
+		//cout << "@3" << endl;
 		clock_t begin_time = clock();
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for(int i=0;i<N;i++){
-			if(V2w[i] < 0) V2w[i]=0;
+			if(V2->w[i] < 0) V2->w[i]=0;
 		}
-		std::cout << "ReluLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
+		//std::cout << "ReluLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
 		
 		//cout << "feed e" << endl;
@@ -130,6 +131,15 @@ public:
 		vector< map<string,void* > > v;
 		return v;
 	}
+string get_layer_type(){
+	return this->layer_type;
+}
+Vol<FP>* get_in_act(){
+	return this->in_act;
+}
+Vol<FP>* get_out_act(){
+	return this->out_act;
+}
 	
 };
 

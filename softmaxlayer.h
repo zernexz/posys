@@ -89,9 +89,13 @@ public:
 
 		
 		FP amax = V->w[0];
+		//cout << " >>> ";
 		for(int i=1;i<this->out_depth;i++){
 			if(V->w[i] > amax) amax = V->w[i];
+			//cout << V->w[i] << " ";
 		}
+		cout << endl;
+
 
 		Utils<FP> ut;
 		vector<FP> es = ut.zeros(this->out_depth);
@@ -140,6 +144,15 @@ public:
 		vector< map<string,void* > > v;
 		return v;
 	}
+string get_layer_type(){
+	return this->layer_type;
+}
+Vol<FP>* get_in_act(){
+	return this->in_act;
+}
+Vol<FP>* get_out_act(){
+	return this->out_act;
+}
 	
 };
 

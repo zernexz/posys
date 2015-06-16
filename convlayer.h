@@ -96,15 +96,15 @@ public:
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
 
-		cout << "feed a" << endl;
+		//cout << "feed a" << endl;
 
 		if(this->in_act != NULL)
 			delete this->in_act;
 		this->in_act = V->clone();
 		
-		cout << "feed b" << endl;
+		//cout << "feed b" << endl;
 		Vol<FP>* A = new Vol<FP>(this->out_sx,this->out_sy,this->out_depth,FP(0.0));
-		cout << "feed c" << endl;
+		//cout << "feed c" << endl;
 		int V_sx = V->sx;
 		int V_sy = V->sy;
 		int V_depth=V->depth;
@@ -113,7 +113,7 @@ public:
 
 
 		clock_t begin_time = clock();
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for(int d=0;d<this->out_depth;d++){
 			Vol<FP>* f = this->filters[d];
 			int x = -this->pad;
@@ -140,7 +140,7 @@ public:
 				}
 			}
 		}
-		std::cout << "ConvLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
+		//std::cout << "ConvLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
 		//cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
@@ -208,6 +208,15 @@ public:
 		v.push_back(m);
 		return v;
 	}
+string get_layer_type(){
+	return this->layer_type;
+}
+Vol<FP>* get_in_act(){
+	return this->in_act;
+}
+Vol<FP>* get_out_act(){
+	return this->out_act;
+}
 	
 };
 

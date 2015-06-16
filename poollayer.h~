@@ -56,8 +56,6 @@ public:
 	vector<FP> switchx;
 	vector<FP> switchy;
 
-	Vol<FP>* in_act;
-	Vol<FP>* out_act;
 	
 	//num_neurons   In:{d,x,y} Conf:{l1_decay,l2_decay}
 	PoolLayer(int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=2,int pad=0){
@@ -112,7 +110,7 @@ public:
 		
 		//cout << "feed ddd" << endl;
 		clock_t begin_time = clock();
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for(int d=0;d<this->out_depth;d++){
 			int x = -this->pad;
 			int y = -this->pad;
@@ -176,6 +174,16 @@ public:
 		vector< map<string,void* > > v;
 		return v;
 	}
+string get_layer_type(){
+	return this->layer_type;
+}
+Vol<FP>* get_in_act(){
+	return this->in_act;
+}
+Vol<FP>* get_out_act(){
+	return this->out_act;
+}
+
 	
 };
 

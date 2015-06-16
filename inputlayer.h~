@@ -56,7 +56,9 @@ public:
 
 	
 	//num_neurons   In:{d,x,y} Conf:{l1_decay,l2_decay}
-	InputLayer(int out_depth,int out_sx,int out_sy):layer_type("input"),in_act(NULL),out_act(NULL),out_depth(out_depth),out_sx(out_sx),out_sy(out_sy){
+	InputLayer(int out_depth,int out_sx,int out_sy):layer_type("input"),out_depth(out_depth),out_sx(out_sx),out_sy(out_sy){
+		this->in_act=NULL;
+		this->out_act=NULL;
 	}
 	~InputLayer(){
 		//cout << "clearrr" << endl;
@@ -68,17 +70,17 @@ public:
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
-		if(this->in_act != NULL)
+		if(this->in_act != NULL){
 			delete this->in_act;
+		}
 		this->in_act = V->clone();
-
 		//cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
 		//cout << "feed f" << endl;
-		this->out_act = V;
+		this->out_act = V->clone();
 		//cout << "feed g" << endl;
 		//cout << "feed h" << endl;
-		return V->clone();
+		return this->in_act;
 	}
 	void backward(int tmpy=0){
 	}
@@ -87,6 +89,15 @@ public:
 		vector< map<string,void* > > v;
 		return v;
 	}
+string get_layer_type(){
+	return this->layer_type;
+}
+Vol<FP>* get_in_act(){
+	return this->in_act;
+}
+Vol<FP>* get_out_act(){
+	return this->out_act;
+}
 	
 };
 

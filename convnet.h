@@ -41,30 +41,47 @@ private:
 
 public:
 vector<Layer<FP>* > net;
+
 ConvNet(vector<Layer<FP>* >  inet){
-		net = inet;        
+		this->net = inet;        
 }
 ~ConvNet(){
-	for(int i=0;i<net.size();i++){
-			delete net[i];
-			net[i]=NULL;
+	for(int i=0;i<this->net.size();i++){
+			delete this->net[i];
+			this->net[i]=NULL;
 	}
-	net.clear();
+	this->net.clear();
 }
 
-Vol<FP>* forward(Vol<FP>* Vin,bool is_training=false){
-		for(int i=0;i<net.size();i++){
-			Vin=net[i]->forward(Vin,is_training);
+void forward(Vol<FP>* V,bool is_training=false){
+Vol<FP>* Vin=V->clone();
+Vol<FP>* Vout;
+		for(int i=0;i<this->net.size();i++){
+			//cout << "Cnet : Feed " << this->net[i]->get_layer_type() << " " << i << endl;
+			Vout=this->net[i]->forward(Vin,is_training);
+			delete Vin;
+			Vin=Vout;
 		}
-		return Vin;
+		delete Vin;
 }
 
 void backward(int y){
-	int N = net.size();
-	net[N-1]->backward(y);
+	int N = this->net.size();
+	this->net[N-1]->backward(y);
 	for(int i=N-2;i>=0;i--){
-		net[i]->backward(y);
+		this->net[i]->backward(y);
 	}
+}
+
+vector< map<string,void* > >  getParamsAndGrads(){
+	vector< map<string,void* > > resp;
+	for(int i=0;i<this->net.size();i++){
+		vector< map<string,void* > > layer_resp = this->net[i]->getParamsAndGrads();
+		for(int j=0;j<layer_resp.size();j++){
+			resp.push_back(layer_resp[j]);
+		}
+	}
+	return resp;
 }
 
 int getPrediction(){
@@ -72,8 +89,9 @@ int getPrediction(){
 	if( S->layer_type.compare("softmax") == 0 ){
 		cout << "getPrediction function assumes softmax as last layer of the net!" << endl;
 	}
-
-	vector<FP> p=S->out_act->w;
+	
+	vector<FP> p=S->get_out_act()->w;
+	//cout << "getPrediction : N " << p.size() << endl;
 	FP maxv = p[0];
 	int maxi = 0;
 	for(int i=1;i<p.size();i++){
@@ -95,15 +113,91 @@ FP momentum=FP(0.9);
 FP ro=FP(0.95);
 FP eps=FP(1e-6);
 int k=0;
-vector<FP> gsum;//last iteration gradients 
-vector<FP> xsum;//used in adadelta
+vector<vector<FP> > gsum;//last iteration gradients 
+vector<vector<FP> > xsum;//used in adadelta
 
 
 void train(Vol<FP>* x,int y){
+	Utils<FP> ut;
+
 	this->forward(x,true);
+	//cout << "Traind :: feed" << endl;
 	this->backward(y);
+	//cout << "Traind :: back" << endl;
 	FP l2_decay_loss=FP(0.0);
-	
+	FP l1_decay_loss=FP(0.0);
+	this->k++;
+	if(this->k % this->batch_size == 0){
+		vector< map<string,void* > >  pglist = this->getParamsAndGrads();
+		if(this->gsum.size() == 0 && ( this->method.compare("sgd") != 0 || this->momentum > 0.0  )){
+			for(int i=0;i<pglist.size();i++){
+				vector<FP> tmp = *((vector<FP>*)pglist[i]["params"]);
+				
+				this->gsum.push_back(ut.zeros(tmp.size()));
+				if( this->method.compare("adadelta") ){
+					this->xsum.push_back(ut.zeros(tmp.size()));
+				}
+				else{
+				}
+			}
+		}
+	  
+
+		for(int i=0;i<pglist.size();i++){
+			map<string,void* > pg = pglist[i];
+			vector<FP> p = *((vector<FP>*) pglist[i]["params"]);
+			vector<FP> g = *((vector<FP>*) pglist[i]["grads"]);
+
+			FP l2_decay_mul = FP(1.0);
+			FP l1_decay_mul = FP(1.0);
+
+			FP l2_decay = this->l2_decay * l2_decay_mul;
+			FP l1_decay = this->l1_decay * l1_decay_mul;
+
+			int plen = p.size();
+			for(int j=0;j<plen;j++){
+				l2_decay_loss += l2_decay*p[j]*p[j]/2;
+				l1_decay_loss += l1_decay*abs(p[j]);
+				FP l1grad = l1_decay * (p[j] > 0 ? 1 : -1);
+				FP l2grad = l2_decay * (p[j]);
+				FP gij = FP(l2grad + l1grad + g[j]) / this->batch_size;
+		
+				vector<FP> gsumi = this->gsum[i];
+				vector<FP> xsumi = this->xsum[i];
+
+				if( this->method.compare("adagrad") == 0 ){
+					//adagrad update
+					gsumi[j] = gsumi[j] + gij * gij;
+					FP dx = - this->learning_rate / sqrt(gsumi[j] + this->eps) * gij;
+					p[j] += dx;
+				} else if( this->method.compare("windowgrad") == 0 ){
+					gsumi[j] = this->ro * gsumi[j] + (1-this->ro)*gij*gij;
+					FP dx = - this->learning_rate / sqrt(gsumi[j] + this->eps) * gij;
+					p[j] += dx;
+				} else if( this->method.compare("adadelta") == 0 ){
+					gsumi[j] = this->ro * gsumi[j] + (1-this->ro) * gij * gij;
+					FP dx = -sqrt( (xsumi[j] + this->eps)/(gsumi[j] + this->eps) ) * gij;
+					xsumi[j] = this->ro * xsumi[j] + (1-this->ro) * dx * dx;
+					p[j] += dx;
+				} else if( this->method.compare("nesterov") == 0 ){
+					FP dx = gsumi[j];
+					gsumi[j] = gsumi[j] * this->momentum + this->learning_rate * gij;
+					dx = this->momentum * dx - (1.0 + this->momentum) * gsumi[j];
+					p[j] += dx;
+				} else {
+					if(this->momentum > 0.0){
+						FP dx = this->momentum * gsumi[j] - this->learning_rate * gij;
+						gsumi[j] = dx;
+						p[j] += dx;
+					}
+					else{
+						p[j] += -this->learning_rate * gij;
+					}
+				}
+				g[j] = 0.0;
+			}
+		}
+	}
 }
 
 

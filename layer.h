@@ -29,10 +29,13 @@ public:
 virtual Vol<FP>* forward(Vol<FP>* V,bool is_training)=0;
 virtual void backward(int y)=0;
 virtual vector< map<string,void* > > getParamsAndGrads()=0;
-string layer_type;
+virtual string get_layer_type()=0;
+virtual Vol<FP>* get_in_act()=0;
+virtual Vol<FP>* get_out_act()=0;
 
-	Vol<FP>* in_act;
-	Vol<FP>* out_act;
+string layer_type;
+Vol<FP>* in_act;
+Vol<FP>* out_act;
 };
 
 #endif

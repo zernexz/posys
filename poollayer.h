@@ -110,7 +110,7 @@ public:
 		
 		//cout << "feed ddd" << endl;
 		clock_t begin_time = clock();
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for(int d=0;d<this->out_depth;d++){
 			int x = -this->pad;
 			int y = -this->pad;
@@ -140,7 +140,7 @@ public:
 				}
 			}
 		}
-		std::cout << "PoolLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
+		//std::cout << "PoolLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
 		//cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
@@ -174,6 +174,16 @@ public:
 		vector< map<string,void* > > v;
 		return v;
 	}
+string get_layer_type(){
+	return this->layer_type;
+}
+Vol<FP>* get_in_act(){
+	return this->in_act;
+}
+Vol<FP>* get_out_act(){
+	return this->out_act;
+}
+
 	
 };
 
