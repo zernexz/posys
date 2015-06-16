@@ -54,11 +54,11 @@ public:
 
 	vector<Vol<FP>* > filters;
 
-	Vol<FP>* in_act;
-	Vol<FP>* out_act;
 	
 	//num_neurons   In:{d,x,y} Conf:{l1_decay,l2_decay}
-	FullyConnLayer(int num_neurons,int in_depth,int in_sx,int in_sy,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0)):in_depth(in_depth),in_sx(in_sx),in_sy(in_sy),l1_decay_mul(l1_decay_mul),l2_decay_mul(l2_decay_mul),layer_type("fc"),bias(bias_pref),in_act(NULL),out_act(NULL),biases(NULL),out_depth(num_neurons){
+	FullyConnLayer(int num_neurons,int in_depth,int in_sx,int in_sy,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0)):in_depth(in_depth),in_sx(in_sx),in_sy(in_sy),l1_decay_mul(l1_decay_mul),l2_decay_mul(l2_decay_mul),layer_type("fc"),bias(bias_pref),biases(NULL),out_depth(num_neurons){
+	this->in_act=NULL;
+	this->out_act=NULL;
 	cout << "cv 0" << endl;
 	this->num_inputs = this->in_sx * this->in_sy * this->in_depth;
 	this->out_sx = 1;
@@ -137,21 +137,22 @@ public:
 	
 	vector< map<string,void* > > getParamsAndGrads(){
 		vector< map<string,void* > > v;
-		/*for(int i=0;i<this->out_depth;i++){
+		for(int i=0;i<this->out_depth;i++){
 			map<string,void* > m;
-			m["params"] = (void*) this->filters[i]->w;
-			m["grads"] = (void*) this->filters[i]->dw;
+			m["params"] = (void*) &this->filters[i]->w;
+			m["grads"] = (void*) &this->filters[i]->dw;
 			m["l2_decay_mul"] = (void*) &this->l2_decay_mul;
 			m["l1_decay_mul"] = (void*) &this->l1_decay_mul;
 			v.push_back(m);
 		}
 		map<string,void* > m;
-		m["params"] = (void*) this->biases->w;
-		m["grads"] = (void*) this->biases->dw;
-		m["l2_decay_mul"] = (void*) &FP(0.0);
-		m["l1_decay_mul"] = (void*) &FP(0.0);
-		*/
-		//v.push_back(m);
+		m["params"] = (void*) &this->biases->w;
+		m["grads"] = (void*) &this->biases->dw;
+		FP* l1=new FP(0.0);
+		FP* l2=new FP(0.0);
+		m["l2_decay_mul"] = (void*) &l2;
+		m["l1_decay_mul"] = (void*) &l1;
+		v.push_back(m);
 		return v;
 	}
 	

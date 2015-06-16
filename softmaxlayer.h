@@ -54,8 +54,6 @@ public:
 
 	vector<Vol<FP>* > filters;
 
-	Vol<FP>* in_act;
-	Vol<FP>* out_act;
 	
 	vector<FP> es;
 	

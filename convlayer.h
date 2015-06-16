@@ -58,11 +58,12 @@ public:
 
 	vector<Vol<FP>* > filters;
 
-	Vol<FP>* in_act;
-	Vol<FP>* out_act;
 	
 	//Out:{d,x,y}   In:{d,x,y} Conv:{stride,pad,l1_decay,l2_decay}
-	ConvLayer(int out_depth,int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=1,int pad=0,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0)):sx(sx),sy(sy),in_depth(in_depth),in_sx(in_sx),in_sy(in_sy),stride(stride),pad(pad),l1_decay_mul(l1_decay_mul),l2_decay_mul(l2_decay_mul),layer_type("conv"),bias(bias_pref),in_act(NULL),out_act(NULL),biases(NULL),out_depth(out_depth){
+	ConvLayer(int out_depth,int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=1,int pad=0,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0)):sx(sx),sy(sy),in_depth(in_depth),in_sx(in_sx),in_sy(in_sy),stride(stride),pad(pad),l1_decay_mul(l1_decay_mul),l2_decay_mul(l2_decay_mul),layer_type("conv"),bias(bias_pref),biases(NULL),out_depth(out_depth){
+
+	this->in_act=NULL;
+	this->out_act=NULL;
 	//cout << "cv 0" << endl;
 	this->out_sx = floor( (this->in_sx + this->pad * 2 - this->sx) / this->stride + 1 );
 	this->out_sy = floor( (this->in_sy + this->pad * 2 - this->sy) / this->stride + 1 );
@@ -71,7 +72,8 @@ public:
 	//cout << "cv 2" << endl;
 	for(int i=0;i<this->out_depth;i++){
 		//cout << "cv 2.1" << endl;
-		this->filters.push_back(new Vol<FP>(this->sx,this->sy,this->in_depth));cout << "cv 2.2" << endl;}
+		this->filters.push_back(new Vol<FP>(this->sx,this->sy,this->in_depth));//cout << "cv 2.2" << endl;
+	}
 	//cout << "cv 3" << endl;
 	this->biases = new Vol<FP>(1, 1, this->out_depth , FP(bias) );
 	//cout << "cv 4" << endl;
@@ -94,15 +96,15 @@ public:
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
 
-		
+		cout << "feed a" << endl;
 
 		if(this->in_act != NULL)
 			delete this->in_act;
 		this->in_act = V->clone();
 		
-		//cout << "feed b" << endl;
+		cout << "feed b" << endl;
 		Vol<FP>* A = new Vol<FP>(this->out_sx,this->out_sy,this->out_depth,FP(0.0));
-		//cout << "feed c" << endl;
+		cout << "feed c" << endl;
 		int V_sx = V->sx;
 		int V_sy = V->sy;
 		int V_depth=V->depth;

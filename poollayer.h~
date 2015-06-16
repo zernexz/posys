@@ -87,14 +87,15 @@ public:
 	//cout << "cv 4" << endl;
 	}
 	~PoolLayer(){
+		this->switchx.clear();
+		this->switchy.clear();
 
 		//cout << "clearrr3" << endl;
 		if(this->in_act != NULL){delete this->in_act;this->in_act=NULL;}
 		//cout << "clearrr5" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
 		//cout << "clearrr4" << endl;
-		this->switchx.clear();
-		this->switchy.clear();
+		
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){

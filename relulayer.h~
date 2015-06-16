@@ -99,7 +99,7 @@ public:
 		Vol<FP>* V2 = V->clone();
 		int N = V->w.size();
 		
-		vector<float> V2w=V2->w;
+		vector<FP> V2w=V2->w;
 		clock_t begin_time = clock();
 		#pragma omp parallel for
 		for(int i=0;i<N;i++){

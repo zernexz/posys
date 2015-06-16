@@ -56,8 +56,6 @@ public:
 	vector<FP> switchx;
 	vector<FP> switchy;
 
-	Vol<FP>* in_act;
-	Vol<FP>* out_act;
 	
 	//num_neurons   In:{d,x,y} Conf:{l1_decay,l2_decay}
 	PoolLayer(int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=2,int pad=0){

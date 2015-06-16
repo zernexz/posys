@@ -531,9 +531,8 @@ vector<int> load_mnist_label(){
 	  }
 	  return vl;
 }
-vector<Layer<FP>* > new_convnet(){
+vector<Layer<FP>* > new_convnet(string sugar){
 	//input[sx:3200,sy:3200,depth:3]>conv[sx:5,filters:16,stride:1,pad:2]>relu>pool[sx:4,sy:4]>fc[num_classes:10]
-	string sugar("input[sx:32,sy:32,depth:3]>conv[sx:5,filters:16,stride:1,pad:2]>relu>pool[sx:5,sy:5]>fc[num_classes:10]");
 	
 	vector<Layer<FP>* > vl;
 	
@@ -606,30 +605,7 @@ vector<Layer<FP>* > new_convnet(){
 								int stride=0;
 								int filters=0;
 								int num_neurons=0;
-/*
-var layer_defs, net, trainer;
-var t = "layer_defs = [];\n\
-layer_defs.push({type:'input', out_sx:32, out_sy:32, out_depth:3});\n\
-* InputLayer(int out_depth,int out_sx,int out_sy)
-layer_defs.push({type:'conv', sx:5, filters:16, stride:1, pad:2, activation:'relu'});\n\
-* ConvLayer(int out_depth,int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=1,int pad=0,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0))
-* ReluLayer(int in_depth,int in_sx,int in_sy)
-layer_defs.push({type:'pool', sx:2, stride:2});\n\
-* PoolLayer(int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=2,int pad=0)
-layer_defs.push({type:'conv', sx:5, filters:20, stride:1, pad:2, activation:'relu'});\n\
-layer_defs.push({type:'pool', sx:2, stride:2});\n\
-layer_defs.push({type:'conv', sx:5, filters:20, stride:1, pad:2, activation:'relu'});\n\
-layer_defs.push({type:'pool', sx:2, stride:2});\n\
-layer_defs.push({type:'softmax', num_classes:10});\n\
-* SoftmaxLayer(int in_depth,int in_sx,int in_sy)
-\n\
-net = new convnetjs.Net();\n\
-net.makeLayers(layer_defs);\n\
-\n\
-trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:4, l2_decay:0.0001});\n\
-";
 
- * */
  
 								for(int i=0;i<attrs.size();i++){
 									cout << attrs[i] << " " << vals[i] << endl;
@@ -656,7 +632,7 @@ trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:4, l2_dec
 									}
 								}
 							
-								cout << " >> " << ltype << " " << sx << " " << sy << " " << depth << " " << stride << " " << pad << " " << filters << endl;
+								cout << " >> " << ltype << " " << sx << " " << sy << " " << depth << " " << stride << " " << pad << " " << filters  << " " << po_depth << " " << po_sx << " " << po_sy << endl;
 								if(ltype.compare("input") == 0){
 									InputLayer<FP>* il=new InputLayer<FP>(sx,sy,depth);	
 									vl.push_back(il);
@@ -666,6 +642,7 @@ trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:4, l2_dec
 								}
 								else{
 									if(ltype.compare("conv") == 0){
+										cout << filters << " % " << sx << " " << po_depth << " " << po_sx << " " << po_sy;
 										ConvLayer<FP>* cl=new ConvLayer<FP>(filters,sx,sx,po_depth,po_sx,po_sy);
 										vl.push_back(cl);
 										po_sx=cl->out_sx;
@@ -701,7 +678,6 @@ trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:4, l2_dec
 					co++;
 				}
 			}
-			
 		}
 	return vl;
 }
@@ -789,11 +765,26 @@ int main(void)
     
     
     
-    
+    int k=0;
     while(true)
     {
-		cvtColor(image, gray_image, CV_BGR2GRAY);
+		//cvtColor(image, gray_image, CV_BGR2GRAY);
 		
+		//>pool[sx:5,sy:5]>fc[num_classes:10]
+		ConvNet<FP>* cnet=new ConvNet<FP>(new_convnet("input[sx:32,sy:32,depth:3]>conv[sx:5,filters:16,stride:1,pad:2]>relu>pool[sx:5,sy:5]"));
+		Vol<FP>* v3 = Vol<FP>::mat_to_vol(vm[k]);
+		Vol<FP>* v4 = cnet->forward(v3);
+		Mat convnet = v4->npho_to_mat();
+		imshow("ConvNet" , convnet);
+		
+		k++;
+		if(k>vm.size())
+			k=0;
+			
+		delete v3;
+		delete v4;
+			
+		/*
 		Vol<float>* v5 = new Vol<float>(2,2,2);
 		
 		Vol<float>* v3 = Vol<float>::mat_to_vol(image);
@@ -887,10 +878,18 @@ int main(void)
 		
 		
 		vector<Layer<FP>*> vl=new_convnet();
+		
+		
+		
+		//this.forward(V, false); Done
+		
+		
+		
+		
 		for(int i=0;i<vl.size();i++){
 			delete vl[i];
 		}
-		
+		*/
         int key = waitKey(1);
         if(key==27)
             return 0;

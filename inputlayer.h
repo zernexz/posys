@@ -54,11 +54,11 @@ public:
 
 	vector<Vol<FP>* > filters;
 
-	Vol<FP>* in_act;
-	Vol<FP>* out_act;
 	
 	//num_neurons   In:{d,x,y} Conf:{l1_decay,l2_decay}
-	InputLayer(int out_depth,int out_sx,int out_sy):layer_type("input"),in_act(NULL),out_act(NULL),out_depth(out_depth),out_sx(out_sx),out_sy(out_sy){
+	InputLayer(int out_depth,int out_sx,int out_sy):layer_type("input"),out_depth(out_depth),out_sx(out_sx),out_sy(out_sy){
+		this->in_act=NULL;
+		this->out_act=NULL;
 	}
 	~InputLayer(){
 		//cout << "clearrr" << endl;

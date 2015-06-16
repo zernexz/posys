@@ -30,6 +30,9 @@ virtual Vol<FP>* forward(Vol<FP>* V,bool is_training)=0;
 virtual void backward(int y)=0;
 virtual vector< map<string,void* > > getParamsAndGrads()=0;
 string layer_type;
+
+	Vol<FP>* in_act;
+	Vol<FP>* out_act;
 };
 
 #endif
