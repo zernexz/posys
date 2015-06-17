@@ -60,7 +60,7 @@ public:
 
 	
 	//Out:{d,x,y}   In:{d,x,y} Conv:{stride,pad,l1_decay,l2_decay}
-	ConvLayer(int out_depth,int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=1,int pad=0,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0)):sx(sx),sy(sy),in_depth(in_depth),in_sx(in_sx),in_sy(in_sy),stride(stride),pad(pad),l1_decay_mul(l1_decay_mul),l2_decay_mul(l2_decay_mul),layer_type("conv"),bias(bias_pref),biases(NULL),out_depth(out_depth){
+	ConvLayer(int out_depth,int sx,int sy,int in_depth,int in_sx,int in_sy,int stride=1,int pad=0,FP l1_decay_mul=FP(0),FP l2_decay_mul=FP(1),FP bias_pref=FP(0)):sx(sx),sy(sy),in_depth(in_depth),in_sx(in_sx),in_sy(in_sy),stride(stride),pad(pad),l1_decay_mul(l1_decay_mul),l2_decay_mul(l2_decay_mul),layer_type("conv"),bias(bias_pref),biases(NULL){
 
 	this->in_act=NULL;
 	this->out_act=NULL;
@@ -70,6 +70,7 @@ public:
 	//cout << "cv 1" << endl;
 	this->bias = bias_pref;
 	//cout << "cv 2" << endl;
+	this->out_depth=out_depth;
 	for(int i=0;i<this->out_depth;i++){
 		//cout << "cv 2.1" << endl;
 		this->filters.push_back(new Vol<FP>(this->sx,this->sy,this->in_depth));//cout << "cv 2.2" << endl;
@@ -98,9 +99,7 @@ public:
 
 		//cout << "feed a" << endl;
 
-		if(this->in_act != NULL)
-			delete this->in_act;
-		this->in_act = V->clone();
+		this->in_act = V;
 		
 		//cout << "feed b" << endl;
 		Vol<FP>* A = new Vol<FP>(this->out_sx,this->out_sy,this->out_depth,FP(0.0));
@@ -120,6 +119,7 @@ public:
 			int y = -this->pad;
 			int f_sx=f->sx;
 			int f_depth=f->depth;
+			
 			for(int ay=0;ay<this->out_sy;y+=xy_stride,ay++){
 				x = -this->pad;
 				for(int ax=0;ax<this->out_sx;x+=xy_stride,ax++){
@@ -150,7 +150,7 @@ public:
 		//cout << "feed h" << endl;
 
 		
-		return A->clone();
+		return this->out_act;
 	}
 	void backward(int tmpy=0){
 		Vol<FP>* V = this->in_act;
@@ -168,6 +168,7 @@ public:
 				x = -this->pad;
 				for(int ax=0;ax<this->out_sx;x+=xy_stride,ax++){
 					FP chain_grad  = this->out_act->get_grad(ax,ay,d);
+					//if(abs(chain_grad)>0.001)cout << chain_grad << endl;
 					for(int fy=0;fy<f->sy;fy++){
 						int oy=y+fy;
 						for(int fx=0;fx<f->sx;fx++){
@@ -188,23 +189,29 @@ public:
 		}
 	}
 	
-	vector< map<string,void* > > getParamsAndGrads(){
-		vector< map<string,void* > > v;
+	vector< map<string,vector<FP>* > > getParamsAndGrads(){
+		vector< map<string,vector<FP>* > > v;//cout << "!1" << endl;
+		/*for(int d=0;d<this->filters.size();d++){
+			for(int l=0;l<this->filters[d]->w.size();l++){
+				this->filters[d]->w[l]=FP(0.1);
+			}
+		}*/
+
 		for(int i=0;i<this->out_depth;i++){
-			map<string,void* > m;
-			m["params"] = (void*) &this->filters[i]->w;
-			m["grads"] = (void*) &this->filters[i]->dw;
-			m["l2_decay_mul"] = (void*) &this->l2_decay_mul;
-			m["l1_decay_mul"] = (void*) &this->l1_decay_mul;
+			map<string,vector<FP>* > m;
+			m["params"] = &this->filters[i]->w; 
+			/*
+			vector<FP>& ww= *tt;
+			for(int l=0;l<ww.size();l++){
+				ww[l]=FP(0.1);
+			}*/
+
+			m["grads"] = &this->filters[i]->dw;
 			v.push_back(m);
-		}
-		map<string,void* > m;
-		m["params"] = (void*) &this->biases->w;
-		m["grads"] = (void*) &this->biases->dw;
-		FP* l1=new FP(0.0);
-		FP* l2=new FP(0.0);
-		m["l2_decay_mul"] = (void*) &l2;
-		m["l1_decay_mul"] = (void*) &l1;
+		}//cout << "!4" << endl;
+		map<string,vector<FP>* > m;
+		m["params"] = &this->biases->w;
+		m["grads"] = &this->biases->dw;
 		v.push_back(m);
 		return v;
 	}

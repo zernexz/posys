@@ -92,9 +92,7 @@ public:
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
-		if(this->in_act != NULL)
-			delete this->in_act;
-		this->in_act = V->clone();
+		this->in_act = V;
 
 		//cout << "feed b" << endl;
 		Vol<FP>* A = new Vol<FP>(1,1,this->out_depth,FP(0.0));
@@ -103,12 +101,13 @@ public:
 
 		//cout << " ::: ";
 		//cout << "feed ddd" << endl;
+		#pragma omp parallel for
 		for(int i=0;i<this->out_depth;i++){
 			FP a(0);
-			Vol<FP>* wi = this->filters[i];
+			//Vol<FP>* wi = this->filters[i];
 			for(int d=0;d<this->num_inputs;d++){
 				//Vw * wi
-				a += this->in_act->w[d] * wi->w[d];
+				a += this->in_act->w[d] * this->filters[i]->w[d];
 			}
 			a+=this->biases->w[i];
 			A->w[i] = a;
@@ -123,42 +122,36 @@ public:
 		this->out_act = A;
 		//cout << "feed g" << endl;
 		//cout << "feed h" << endl;
-		return A->clone();
+		return this->out_act;
 	}
 	void backward(int tmpy=0){
-		Vol<FP>* V = this->in_act;
+		//Vol<FP>* V = this->in_act;
 		Utils<FP> ut;
-		V->dw = ut.zeros(V->w.size());
-		
+		this->in_act->dw = ut.zeros(this->in_act->w.size());
+		#pragma omp parallel for
 		for(int i=0;i<this->out_depth;i++){
-			Vol<FP>* tfi = this->filters[i];
+			//Vol<FP>* tfi = this->filters[i];
 			FP chain_grad = this->out_act->dw[i];
 			for(int d=0;d<this->num_inputs;d++){
-				V->dw[d] += tfi->w[d]*chain_grad;
-				tfi->dw[d] += V->w[d]*chain_grad;
+				this->in_act->dw[d] += this->filters[i]->w[d]*chain_grad;
+				this->filters[i]->dw[d] += this->in_act->w[d]*chain_grad;
 			}
 			this->biases->dw[i] += chain_grad;
 		}
 
 	}
 	
-	vector< map<string,void* > > getParamsAndGrads(){
-		vector< map<string,void* > > v;
+	vector< map<string, vector<FP>* > > getParamsAndGrads(){
+		vector< map<string, vector<FP>* > > v;
 		for(int i=0;i<this->out_depth;i++){
-			map<string,void* > m;
-			m["params"] = (void*) &this->filters[i]->w;
-			m["grads"] = (void*) &this->filters[i]->dw;
-			m["l2_decay_mul"] = (void*) &this->l2_decay_mul;
-			m["l1_decay_mul"] = (void*) &this->l1_decay_mul;
+			map<string, vector<FP>* > m;
+			m["params"] = &this->filters[i]->w;
+			m["grads"] = &this->filters[i]->dw;
 			v.push_back(m);
 		}
-		map<string,void* > m;
-		m["params"] = (void*) &this->biases->w;
-		m["grads"] = (void*) &this->biases->dw;
-		FP* l1=new FP(0.0);
-		FP* l2=new FP(0.0);
-		m["l2_decay_mul"] = (void*) &l2;
-		m["l1_decay_mul"] = (void*) &l1;
+		map<string,vector<FP>* > m;
+		m["params"] = &this->biases->w;
+		m["grads"] = &this->biases->dw;
 		v.push_back(m);
 		return v;
 	}
@@ -169,6 +162,7 @@ Vol<FP>* get_in_act(){
 	return this->in_act;
 }
 Vol<FP>* get_out_act(){
+	return this->out_act;
 	Vol<FP>* oa=this->out_act;
 	
 	int maxi=0;

@@ -28,7 +28,7 @@ private:
 public:
 virtual Vol<FP>* forward(Vol<FP>* V,bool is_training)=0;
 virtual void backward(int y)=0;
-virtual vector< map<string,void* > > getParamsAndGrads()=0;
+virtual vector< map<string, vector<FP>* > > getParamsAndGrads()=0;
 virtual string get_layer_type()=0;
 virtual Vol<FP>* get_in_act()=0;
 virtual Vol<FP>* get_out_act()=0;

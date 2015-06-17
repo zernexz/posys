@@ -97,11 +97,7 @@ public:
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
-		if(this->in_act != NULL){
-			delete this->in_act;
-			this->in_act = NULL;
-		}
-		this->in_act = V->clone();
+		this->in_act = V;
 
 		//cout << "feed b" << endl;
 		Vol<FP>* A = new Vol<FP>(this->out_sx,this->out_sy,this->out_depth,FP(0.0));
@@ -110,7 +106,7 @@ public:
 		
 		//cout << "feed ddd" << endl;
 		clock_t begin_time = clock();
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for(int d=0;d<this->out_depth;d++){
 			int x = -this->pad;
 			int y = -this->pad;
@@ -140,7 +136,7 @@ public:
 				}
 			}
 		}
-		std::cout << "PoolLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
+		//std::cout << "PoolLayer : " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << endl;
 
 		//cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
@@ -148,7 +144,7 @@ public:
 		this->out_act = A;
 		//cout << "feed g" << endl;
 		//cout << "feed h" << endl;
-		return A->clone();
+		return this->out_act;
 	}
 	void backward(int tmpy=0){
 		Vol<FP>* V = this->in_act;
@@ -156,6 +152,7 @@ public:
 		V->dw = ut.zeros(V->w.size());
 		
 		int n=0;
+		#pragma omp parallel for
 		for(int d=0;d<this->out_depth;d++){
 			int x = -this->pad;
 			int y = -this->pad;
@@ -163,6 +160,7 @@ public:
 				y = -this->pad;
 				for(int ay=0;ay<this->out_sy;y+=this->stride,ay++){
 					FP chain_grad = this->out_act->get_grad(ax,ay,d);
+					//if(abs(chain_grad)>0.001)cout << "#p" << endl;
 					V->add_grad(this->switchx[n],this->switchy[n],d,chain_grad);
 					n++;
 				}
@@ -170,8 +168,8 @@ public:
 		}
 	}
 	
-	vector< map<string,void* > > getParamsAndGrads(){
-		vector< map<string,void* > > v;
+	vector< map<string,vector<FP>* > > getParamsAndGrads(){
+		vector< map<string,vector<FP>* > > v;
 		return v;
 	}
 string get_layer_type(){

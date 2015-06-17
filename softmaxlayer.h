@@ -81,9 +81,7 @@ public:
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
-		if(this->in_act != NULL)
-			delete this->in_act;
-		this->in_act = V->clone();
+		this->in_act = V;
 		
 		Vol<FP>* A = new Vol<FP>(1,1,this->out_depth,FP(0));
 
@@ -124,13 +122,14 @@ public:
 		this->out_act = A;
 		//cout << "feed g" << endl;
 		//cout << "feed h" << endl;
-		return A->clone();
+		return this->out_act;
 	}
 	void backward(int y){
 		Vol<FP>* x=this->in_act;
 		Utils<FP> ut;
 		
 		x->dw = ut.zeros(x->w.size());
+		
 		for(int i=0;i<this->out_depth;i++){
 			FP indicator( (i==y)?1:0 );
 			FP mul(  -(indicator - this->es[i])  );
@@ -140,8 +139,8 @@ public:
 		//return -log(this->es[y]);		
 	}
 	
-	vector< map<string,void* > > getParamsAndGrads(){
-		vector< map<string,void* > > v;
+	vector< map<string, vector<FP>* > > getParamsAndGrads(){
+		vector< map<string, vector<FP>* > > v;
 		return v;
 	}
 string get_layer_type(){

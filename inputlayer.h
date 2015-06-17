@@ -70,23 +70,20 @@ public:
 	}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
-		if(this->in_act != NULL){
-			delete this->in_act;
-		}
-		this->in_act = V->clone();
+		this->in_act = V;
 		//cout << "feed e" << endl;
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
 		//cout << "feed f" << endl;
 		this->out_act = V->clone();
 		//cout << "feed g" << endl;
 		//cout << "feed h" << endl;
-		return V->clone();
+		return this->out_act;
 	}
 	void backward(int tmpy=0){
 	}
 	
-	vector< map<string,void* > > getParamsAndGrads(){
-		vector< map<string,void* > > v;
+	vector< map<string, vector<FP> * > > getParamsAndGrads(){
+		vector< map<string, vector<FP> * > > v;
 		return v;
 	}
 string get_layer_type(){
