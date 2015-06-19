@@ -51,6 +51,8 @@ public:
 	FP l1_decay_mul;
 	FP l2_decay_mul;
 
+
+
 	string layer_type;
 
 	FP bias;
@@ -94,6 +96,52 @@ public:
 		if(this->out_act != NULL){delete this->out_act;this->out_act=NULL;}
 		//cout << "clearrr4" << endl;
 	}
+
+vector<FP> get_all_w(){
+	vector<FP> out;
+
+	Vol<FP>* V;
+	vector< Vol<FP>* > list;
+
+	for(int q=0;q<this->filters.size();q++)
+		list.push_back(this->filters[q]);
+	list.push_back(this->biases);
+
+	for(int z=0;z<list.size();z++){
+		V=list[z];
+		int size=V->w.size();
+		//cout << size << endl;
+		for(int q=0;q<size;q++){
+			out.push_back(V->w[q]);
+		}
+	}
+
+	return out;
+}
+void set_all_w(vector<FP> aw){
+	Vol<FP>* V;
+	vector< Vol<FP>* > list;
+	vector<int> slist;
+	int as=0;
+
+	for(int q=0;q<this->filters.size();q++){
+		list.push_back(this->filters[q]);
+		slist.push_back(this->filters[q]->w.size());
+		as+=this->filters[q]->w.size();		
+	}
+	slist.push_back(this->biases->w.size());
+	list.push_back(this->biases);
+	as+=this->biases->w.size();
+
+	for(int i=0,q=0;i<slist.size();i++){
+		V = list[i];
+		for(int j=0;j<slist[i];j++,q++){
+			V->w[j]=aw[q];
+			
+		}
+	}
+
+}
 
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
 

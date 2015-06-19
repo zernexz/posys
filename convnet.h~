@@ -41,10 +41,14 @@ private:
 
 public:
 vector<Layer<FP>* > net;
+String sugar;
 
-ConvNet(vector<Layer<FP>* >  inet){
+ConvNet(String sugar){
+this->sugar = sugar;
+vector<Layer<FP>* >  inet=new_convnet(this->sugar);
 		this->net = inet;        
 }
+
 ~ConvNet(){
 	for(int i=0;i<this->net.size();i++){
 			delete this->net[i];
@@ -52,6 +56,90 @@ ConvNet(vector<Layer<FP>* >  inet){
 	}
 	this->net.clear();
 }
+
+
+void save(String path){
+	//Save txt file ..
+	//Save ConvNet Architecture : Sugar String
+	//Save ConvNet Weight for each layer : Weight for each layer
+
+  char pstr[512]; // enough to hold all numbers up to 64-bits
+  sprintf(pstr,"%s_sugar",path.c_str());
+
+ ofstream myfile (pstr);
+  if (myfile.is_open())
+  {
+    myfile << this->sugar << "\n";
+    myfile.close();
+  }
+  else cout << "Unable to open file" << endl;
+
+
+    for(int no=0;no<this->net.size();no++){
+	char numstr[512]; // enough to hold all numbers up to 64-bits
+	sprintf(numstr,"%s_%d_%s",path.c_str(),no,this->net[no]->get_layer_type().c_str());
+	vector<FP> pt=this->net[no]->get_all_w();
+
+	std::ofstream ofs(numstr);
+        boost::archive::text_oarchive oa(ofs);
+       	oa << pt;
+        
+        // archive and stream closed when destructors are called
+    }
+
+}
+
+
+void load(String path){
+	//Read txt file .. May be binary file
+	//Load ConvNet Architecture
+	//Load ConvNet Weight for each layer
+
+  string line;
+
+  char pstr[512]; // enough to hold all numbers up to 64-bits
+  sprintf(pstr,"%s_sugar",path.c_str());
+
+  ifstream myfile (pstr);
+  int co=0;
+  if (myfile.is_open())
+  {
+    while ( getline (myfile,line) )
+    {
+	if(co==0&&this->net==NULL){
+		this->sugar=line;
+		vector<Layer<FP>* >  inet=new_convnet(this->sugar);
+		this->net = inet;  
+	}
+	else{
+		for(int i=0;i<this->net.size();i++){
+			//net[i]
+		}
+	}
+      	cout << line << '\n';
+	co++;
+    }
+    myfile.close();
+  }
+
+  else cout << "Unable to open file"; 
+
+
+    for(int no=0;no<this->net.size();no++){
+	char numstr[512]; // enough to hold all numbers up to 64-bits
+	sprintf(numstr,"%s_%d_%s",path.c_str(),no,this->net[no]->get_layer_type().c_str());
+        // create and open an archive for input
+	vector<FP> pt;
+        std::ifstream ifs(numstr);
+        boost::archive::text_iarchive ia(ifs);
+        // read class state from archive
+        ia >> pt;
+	this->net[no]->set_all_w(pt);
+        // archive and stream closed when destructors are called
+    }
+}
+
+
 
 void forward(Vol<FP>* Vin,bool is_training=false){
 //Vol<FP>* Vin=V->clone();
@@ -109,7 +197,7 @@ int getPrediction(){
 FP learning_rate=FP(0.01);
 FP l1_decay=FP(0.0);
 FP l2_decay=FP(0.0001);
-int batch_size=1;
+int batch_size=20;
 string method = "sdg";
 //sgd/adagrad/adadelta/windowgrad/netsterov
 FP momentum=FP(0.9);
@@ -206,6 +294,161 @@ void train(Vol<FP>* x,int y){
 			}
 		}
 	}
+}
+
+
+
+vector<Layer<FP>* > new_convnet(string sugar){
+	this->sugar=sugar;
+	vector<Layer<FP>* > vl;
+	
+	string line;
+	string type;
+	string conf;
+	string att;
+	int val;
+	stringstream ss;
+	ss << sugar;
+	
+	int po_sx;
+	int po_sy;
+	int po_depth;
+	while ( getline (ss,line,'>') )
+		{
+			if(stringstream(line)>>conf){
+				cout << "conf:" << conf << endl;
+				stringstream sc;
+				string tmp;
+				sc << conf;
+				
+				string ltype;
+				vector<string> attrs;
+				vector<int> vals;
+							
+				int co=0;
+				while ( getline (sc,tmp,'[') )
+				{
+					if(stringstream(tmp)>>type){
+						if(co==0){//Type of Layer
+							//cout << "Layer:" << type << endl;
+							ltype=type;
+						}
+						else{//Attributes
+							//cout << "Attr " <<  type << endl;
+							stringstream cc;
+							cc << type;
+							string tm,tmm;
+							
+							while ( getline (cc,tm,',') )
+							{
+								if(stringstream(tm)>>tmm){
+									
+									stringstream scc;
+									scc << tmm;
+									string tp;
+									int cn=0;
+									while ( getline (scc,tmm,':') )
+									{
+										if(cn==0&&stringstream(tmm)>>tp){
+											
+										}
+										else if(cn==1&&stringstream(tmm)>>val){
+											//cout << "Attr " << tp << ":" << val << endl;
+											attrs.push_back(tp);
+											vals.push_back(val);
+										}
+										cn++;
+									}
+								}
+							}
+							//Add new Layer here
+							{
+								cout << "* " << ltype << endl;
+								int sx=0;
+								int sy=0;
+								int depth=0;
+								int pad=0;
+								int stride=0;
+								int filters=0;
+								int num_neurons=0;
+
+ 
+								for(int i=0;i<attrs.size();i++){
+									cout << attrs[i] << " " << vals[i] << endl;
+									if(attrs[i].compare("sx") == 0){
+										sx=vals[i];
+									}
+									if(attrs[i].compare("sy") == 0){
+										sy=vals[i];
+									}
+									if(attrs[i].compare("depth") == 0){
+										depth=vals[i];
+									}
+									if(attrs[i].compare("stride") == 0){
+										stride=vals[i];
+									}
+									if(attrs[i].compare("pad") == 0){
+										pad=vals[i];
+									}
+									if(attrs[i].compare("filters") == 0){
+										filters=vals[i];
+									}
+									if(attrs[i].compare("num_neurons") == 0){
+										num_neurons=vals[i];
+									}
+								}
+							
+								cout << " >> " << ltype << " " << sx << " " << sy << " " << depth << " " << stride << " " << pad << " " << filters  << " " << po_depth << " " << po_sx << " " << po_sy << endl;
+								if(ltype.compare("input") == 0){
+									InputLayer<FP>* il=new InputLayer<FP>(sx,sy,depth);	
+									vl.push_back(il);
+									po_sx=sx;
+									po_sy=sy;
+									po_depth=depth;
+								}
+								else{
+									if(ltype.compare("conv") == 0){
+										cout << filters << " % " << sx << " " << po_depth << " " << po_sx << " " << po_sy;
+										ConvLayer<FP>* cl=new ConvLayer<FP>(filters,sx,sx,po_depth,po_sx,po_sy);
+										vl.push_back(cl);
+										po_sx=cl->out_sx;
+										po_sy=cl->out_sy;
+										po_depth=cl->out_depth;
+									}
+									if(ltype.compare("relu") == 0){
+										ReluLayer<FP>* rl=new ReluLayer<FP>(po_depth,po_sx,po_sy);
+										vl.push_back(rl);
+									}
+									if(ltype.compare("pool") == 0){
+										cout << sx << " " << sy << " " << po_depth << " " << po_sx << " " << po_sy << endl;
+										PoolLayer<FP>* pl=new PoolLayer<FP>(sx,sy,po_depth,po_sx,po_sy);
+										vl.push_back(pl);
+										po_sx=pl->out_sx;
+										po_sy=pl->out_sy;
+										po_depth=pl->out_depth;
+									}
+									if(ltype.compare("softmax") == 0){
+										SoftmaxLayer<FP>* sml=new SoftmaxLayer<FP>(po_depth,po_sx,po_sy);
+										vl.push_back(sml);
+									}
+									if(ltype.compare("fc") == 0){
+										cout << " ** " << num_neurons << " " << po_depth << " " << po_sx << " " << po_sy << endl;
+										FullyConnLayer<FP>* fc=new FullyConnLayer<FP>(num_neurons,po_depth,po_sx,po_sy);
+										vl.push_back(fc);
+										po_sx=fc->out_sx;
+										po_sy=fc->out_sy;
+										po_depth=fc->out_depth;
+									}
+								}
+							}
+						}
+					}
+					co++;
+				}
+			}
+		}
+		
+	return vl;
 }
 
 

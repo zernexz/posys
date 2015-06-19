@@ -88,6 +88,40 @@ public:
 		//cout << "clearrr4" << endl;
 	}
 
+vector<FP> get_all_w(){
+	vector<FP> out;
+
+	Vol<FP>* V;
+	vector< Vol<FP>* > list;
+
+	for(int z=0;z<list.size();z++){
+		V=list[z];
+		int size=V->w.size();
+		cout << size << endl;
+		for(int q=0;q<size;q++){
+			out.push_back(V->w[q]);
+		}
+	}
+
+	return out;
+}
+void set_all_w(vector<FP> aw){
+	Vol<FP>* V;
+	vector< Vol<FP>* > list;
+	vector<int> slist;
+	int as=0;
+
+	for(int i=0,q=0;i<slist.size();i++){
+		V = list[i];
+		for(int j=0;j<slist[i];j++,q++){
+			//V->w[j]=aw[q];
+			if(V->w[j]!=aw[q]){
+				cout << " WTFF! " << endl;
+			}
+		}
+	}
+
+}
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
 		//cout << "@1" << endl;
 		this->in_act = V;
@@ -97,7 +131,7 @@ public:
 		int N = V2->w.size();
 		//cout << "@3" << endl;
 		clock_t begin_time = clock();
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for(int i=0;i<N;i++){
 			if(V2->w[i] < 0) V2->w[i]=0;
 		}
@@ -118,7 +152,7 @@ public:
 		int N = V->w.size();
 		Utils<FP> ut;
 		V->dw = ut.zeros(V->w.size());
-		#pragma omp parallel for
+		
 		for(int i=0;i<N;i++){
 			if(V2->w[i] <= 0) V->dw[i] = 0;
 			else V->dw[i] = V2->dw[i];

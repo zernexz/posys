@@ -32,6 +32,8 @@ virtual vector< map<string, vector<FP>* > > getParamsAndGrads()=0;
 virtual string get_layer_type()=0;
 virtual Vol<FP>* get_in_act()=0;
 virtual Vol<FP>* get_out_act()=0;
+virtual vector<FP> get_all_w()=0;
+virtual void set_all_w(vector<FP> aw)=0;
 
 string layer_type;
 Vol<FP>* in_act;

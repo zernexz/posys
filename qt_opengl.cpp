@@ -532,162 +532,10 @@ vector<int> load_mnist_label(){
 	  }
 	  return vl;
 }
-vector<Layer<FP>* > new_convnet(string sugar){
-	//input[sx:3200,sy:3200,depth:3]>conv[sx:5,filters:16,stride:1,pad:2]>relu>pool[sx:4,sy:4]>fc[num_classes:10]
-	
-	vector<Layer<FP>* > vl;
-	
-	string line;
-	string type;
-	string conf;
-	string att;
-	int val;
-	stringstream ss;
-	ss << sugar;
-	
-	int po_sx;
-	int po_sy;
-	int po_depth;
-	while ( getline (ss,line,'>') )
-		{
-			if(stringstream(line)>>conf){
-				cout << "conf:" << conf << endl;
-				stringstream sc;
-				string tmp;
-				sc << conf;
-				
-				string ltype;
-				vector<string> attrs;
-				vector<int> vals;
-							
-				int co=0;
-				while ( getline (sc,tmp,'[') )
-				{
-					if(stringstream(tmp)>>type){
-						if(co==0){//Type of Layer
-							//cout << "Layer:" << type << endl;
-							ltype=type;
-						}
-						else{//Attributes
-							//cout << "Attr " <<  type << endl;
-							stringstream cc;
-							cc << type;
-							string tm,tmm;
-							
-							while ( getline (cc,tm,',') )
-							{
-								if(stringstream(tm)>>tmm){
-									
-									stringstream scc;
-									scc << tmm;
-									string tp;
-									int cn=0;
-									while ( getline (scc,tmm,':') )
-									{
-										if(cn==0&&stringstream(tmm)>>tp){
-											
-										}
-										else if(cn==1&&stringstream(tmm)>>val){
-											//cout << "Attr " << tp << ":" << val << endl;
-											attrs.push_back(tp);
-											vals.push_back(val);
-										}
-										cn++;
-									}
-								}
-							}
-							//Add new Layer here
-							{
-								cout << "* " << ltype << endl;
-								int sx=0;
-								int sy=0;
-								int depth=0;
-								int pad=0;
-								int stride=0;
-								int filters=0;
-								int num_neurons=0;
 
- 
-								for(int i=0;i<attrs.size();i++){
-									cout << attrs[i] << " " << vals[i] << endl;
-									if(attrs[i].compare("sx") == 0){
-										sx=vals[i];
-									}
-									if(attrs[i].compare("sy") == 0){
-										sy=vals[i];
-									}
-									if(attrs[i].compare("depth") == 0){
-										depth=vals[i];
-									}
-									if(attrs[i].compare("stride") == 0){
-										stride=vals[i];
-									}
-									if(attrs[i].compare("pad") == 0){
-										pad=vals[i];
-									}
-									if(attrs[i].compare("filters") == 0){
-										filters=vals[i];
-									}
-									if(attrs[i].compare("num_neurons") == 0){
-										num_neurons=vals[i];
-									}
-								}
-							
-								cout << " >> " << ltype << " " << sx << " " << sy << " " << depth << " " << stride << " " << pad << " " << filters  << " " << po_depth << " " << po_sx << " " << po_sy << endl;
-								if(ltype.compare("input") == 0){
-									InputLayer<FP>* il=new InputLayer<FP>(sx,sy,depth);	
-									vl.push_back(il);
-									po_sx=sx;
-									po_sy=sy;
-									po_depth=depth;
-								}
-								else{
-									if(ltype.compare("conv") == 0){
-										cout << filters << " % " << sx << " " << po_depth << " " << po_sx << " " << po_sy;
-										ConvLayer<FP>* cl=new ConvLayer<FP>(filters,sx,sx,po_depth,po_sx,po_sy);
-										vl.push_back(cl);
-										po_sx=cl->out_sx;
-										po_sy=cl->out_sy;
-										po_depth=cl->out_depth;
-									}
-									if(ltype.compare("relu") == 0){
-										ReluLayer<FP>* rl=new ReluLayer<FP>(po_depth,po_sx,po_sy);
-										vl.push_back(rl);
-									}
-									if(ltype.compare("pool") == 0){
-										cout << sx << " " << sy << " " << po_depth << " " << po_sx << " " << po_sy << endl;
-										PoolLayer<FP>* pl=new PoolLayer<FP>(sx,sy,po_depth,po_sx,po_sy);
-										vl.push_back(pl);
-										po_sx=pl->out_sx;
-										po_sy=pl->out_sy;
-										po_depth=pl->out_depth;
-									}
-									if(ltype.compare("softmax") == 0){
-										SoftmaxLayer<FP>* sml=new SoftmaxLayer<FP>(po_depth,po_sx,po_sy);
-										vl.push_back(sml);
-									}
-									if(ltype.compare("fc") == 0){
-										cout << " ** " << num_neurons << " " << po_depth << " " << po_sx << " " << po_sy << endl;
-										FullyConnLayer<FP>* fc=new FullyConnLayer<FP>(num_neurons,po_depth,po_sx,po_sy);
-										vl.push_back(fc);
-										po_sx=fc->out_sx;
-										po_sy=fc->out_sy;
-										po_depth=fc->out_depth;
-									}
-								}
-							}
-						}
-					}
-					co++;
-				}
-			}
-		}
-		
-	return vl;
-}
 int main(void)
 {
-	//calibrateCamera(0);
+	//calibrateCamera(2);
 	//unDist(0);
 	
 	
@@ -736,7 +584,7 @@ int main(void)
 		cout << vp[i] << " ";
 	cout << endl;
 	*/
-	
+//ConvNet
 	//Test Vol
 	Vol<float>* v1=new Vol<float>(5,4,3);
 	for(int i=0;i<5*4*3;i++){
@@ -772,14 +620,25 @@ int main(void)
     
     int k=0;
     
-ConvNet<FP>* cnet=new ConvNet<FP>(new_convnet("\
-input[sx:32,sy:32,depth:3]>conv[sx:5,filters:20,stride:1,pad:2]>relu[]>pool[sx:2,sy:2]\
->conv[sx:5,filters:20,stride:1,pad:2]>relu[]>pool[sx:2,sy:2]\
+ConvNet<FP>* cnet=new ConvNet<FP>("");
+/*
+
+\
+input[sx:32,sy:32,depth:3]>conv[sx:4,filters:40,stride:1,pad:2]>relu[]>pool[sx:2,sy:2]\
+>conv[sx:4,filters:50,stride:1,pad:2]>relu[]>pool[sx:2,sy:2]\
+>conv[sx:4,filters:60,stride:1,pad:2]>relu[]>pool[sx:2,sy:2]\
 >fc[num_neurons:10]>softmax[]\
-"));
+
+*/
+
 Utils<FP> ut;
 FP rp=FP(0);
 int saw=0;
+
+string convpath="conv_no2/cnet";
+//cnet->save(convpath);
+cnet->load(convpath);
+
     while(true)
     {
 		//cvtColor(image, gray_image, CV_BGR2GRAY);
@@ -823,6 +682,11 @@ int saw=0;
 	
 		
 	}
+	
+	if(saw%1000==0){
+		cnet->save(convpath);
+		cnet->load(convpath);
+	}
 		cout << k << "/" << vm.size() << " saw : " << saw << "  Correct Percent : " << rp << endl;
 		//Vol<FP>* v4 = cnet->forward(v3);
 		//Mat convnet = v4->npho_to_mat();
@@ -847,119 +711,15 @@ int saw=0;
 			
 		delete v3;
 		//delete v4;
-			
-		/*
-		Vol<float>* v5 = new Vol<float>(2,2,2);
-		
-		Vol<float>* v3 = Vol<float>::mat_to_vol(image);
-		
-		//Vol<float>* v4 = Vol<float>::augment(*v3,300,0,0,true);
-		//cout << "0" << endl;
-		ConvLayer<float>* cvl=new ConvLayer<float>(3,9,9,3,v3->sx,v3->sy);
-		//cout << "1" << endl;
-		Vol<float>* v4 = cvl->forward(v3);
-		
 
-		
-		//cout << "2" << endl;
-		Mat convimg = v4->npho_to_mat();
-		//cout << "3" << endl;
-		//cout << "4" << endl;
-		
-		
-		for(int i=0;i<v5->sx*v5->sy*v5->depth;i++){
-			v5->w[i]=i;
-		}
-		
-		
-		
-		SoftmaxLayer<float>* sml=new SoftmaxLayer<float>(2,2,2);
-		Vol<float>* smr=sml->forward(v5);
-		
-		//cout << smr->sx << " " << smr->sy << " " << smr->depth << endl;
-		for(int i=0;i<smr->sx;i++){
-			for(int j=0;j<smr->sy;j++){
-				for(int k=0;k<smr->depth;k++){
-					//cout << smr->get(i,j,k) << " ";
-				}
-			}
-		}
-		//cout << endl;
-		
-		
-		
-		PoolLayer<float>* pl=new PoolLayer<float>(5,5,16,9000,9000);
-		//Vol<float>* v6=pl->forward(v4);
-		//Mat poolimg=v6->npho_to_mat();
-		
-		//cout << v3->sx << " x " << v3->sy << endl;
-		//cout << v4->sx << " x " << v4->sy << endl;
-		//cout << v6->sx << " x " << v6->sy << endl;
-		
-		//ReluLayer<float>* rl=new ReluLayer<float>(v6->depth,v6->sx,v6->sy);
-		//Vol<float>* v7=rl->forward(v6);
-		//Mat reluimg = v7->po_to_mat();
-		
-        imshow("win1" , image);
-        imshow("win2" , gray_image);
-        imshow("ConvLayer" , convimg);
-        //imshow("PoolLayer" , poolimg);
-        
-        
-        //imshow("ReluLayer" , reluimg);
-        
-        //cout << "******* " << vm.size() << " " << vl.size() << endl;
-        char numstr[512]; // enough to hold all numbers up to 64-bits
-        for(int i=29995;i<29995+10;i++){
-			
-			sprintf(numstr,"MNIST %d - %d",i,vl[i]);
-			imshow(numstr , vm[i]);
-		}
-		
-		
-		
-        //cout << "5" << endl;
-        
-        
-        
-        
-        //delete rl;
-        //delete v7;
-        
-        
-        delete pl;
-        //delete v6;
-        
-		delete smr;
-		delete sml;
-        
-       
-        delete v3;
-		delete v5;
-		delete v4;
-		delete cvl;
-		//cout << "6" << endl;
-		
-		
-		vector<Layer<FP>*> vl=new_convnet();
-		
-		
-		
-		//this.forward(V, false); Done
-		
-		
-		
-		
-		for(int i=0;i<vl.size();i++){
-			delete vl[i];
-		}
-		*/
         int key = waitKey(1);
         if(key==27)
             return 0;
     }
     
 	delete cnet;
+	
+	
 	
 	/*
 	int numBoards = 40;
@@ -1081,10 +841,10 @@ int saw=0;
                    "This demo is only to illustrate how to use OpenGL callback.\n"
                    " -- Press ESC to exit.", 10000);
 
-    float OpenGLMatrix[] = { 0, 0, 0, 0,
-                             0, 0, 0, 0,
-                             0, 0, 0, 0,
-                             0, 0, 0, 0 };
+    float OpenGLMatrix[] = { 1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                             0, 0, 0, 1 };
     setOpenGlContext("POSIT");
     setOpenGlDrawCallback("POSIT", on_opengl, OpenGLMatrix);
 
@@ -1099,7 +859,7 @@ int saw=0;
     CvTermCriteria criteria = cvTermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 100, 1e-4f);
     vector<CvPoint2D32f> srcImagePoints(4, cvPoint2D32f(0, 0));
 
-    while (waitKey(33) != 27)
+    while (true)
     {
         video >> source;
         if (source.empty())
@@ -1107,12 +867,15 @@ int saw=0;
 
         imshow("Original", source);
 
-        foundCorners(&srcImagePoints, source, grayImage);
-        cvPOSIT(positObject, &srcImagePoints[0], FOCAL_LENGTH, criteria, rotation_matrix, translation_vector);
-        createOpenGLMatrixFrom(OpenGLMatrix, rotation_matrix, translation_vector);
+        //foundCorners(&srcImagePoints, source, grayImage);
+        //cvPOSIT(positObject, &srcImagePoints[0], FOCAL_LENGTH, criteria, rotation_matrix, translation_vector);
+        //createOpenGLMatrixFrom(OpenGLMatrix, rotation_matrix, translation_vector);
 
         updateWindow("POSIT");
-
+        int keycode=waitKey(33);
+		if(keycode>-1){
+			cout << keycode << endl;
+		}
         if (video.get(CV_CAP_PROP_POS_AVI_RATIO) > 0.99)
             video.set(CV_CAP_PROP_POS_AVI_RATIO, 0);
     }
@@ -1123,6 +886,6 @@ int saw=0;
 
     delete[]rotation_matrix;
     delete[]translation_vector;
-*/
-    return EXIT_SUCCESS;
+
+    return EXIT_SUCCESS;*/
 }

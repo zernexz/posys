@@ -96,6 +96,38 @@ public:
 		
 	}
 
+vector<FP> get_all_w(){
+	vector<FP> out;
+
+	Vol<FP>* V;
+	vector< Vol<FP>* > list;
+
+	for(int z=0;z<list.size();z++){
+		V=list[z];
+		int size=V->w.size();
+		//cout << size << endl;
+		for(int q=0;q<size;q++){
+			out.push_back(V->w[q]);
+		}
+	}
+
+	return out;
+}
+void set_all_w(vector<FP> aw){
+	Vol<FP>* V;
+	vector< Vol<FP>* > list;
+	vector<int> slist;
+	int as=0;
+
+
+	for(int i=0,q=0;i<slist.size();i++){
+		V = list[i];
+		for(int j=0;j<slist[i];j++,q++){
+			V->w[j]=aw[q];
+		}
+	}
+
+}
 	Vol<FP>* forward(Vol<FP>* V,bool is_training=false){
 		this->in_act = V;
 
